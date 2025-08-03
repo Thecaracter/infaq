@@ -92,14 +92,15 @@
                     </div>
 
                     <!-- User Management -->
-<a href="{{ route('admin.user.index') }}" class="nav-item flex items-center px-6 py-4 mb-3 rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
+                <a href="{{ route('admin.user.index') }}" class="nav-item flex items-center px-6 py-4 mb-3 rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
     <div class="w-6 h-6 mr-4 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
         <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-1a4 4 0 00-4-4h-1M9 20H4v-1a4 4 0 014-4h1m4-2a4 4 0 100-8 4 4 0 000 8zm6 0a4 4 0 100-8 4 4 0 000 8z" />
         </svg>
     </div>
     <span class="font-semibold">Kelola User</span>
 </a>
+
                 </div>
             @endif
 
@@ -162,42 +163,6 @@
                         </svg>
                     </div>
                     <span class="font-semibold">Export Data</span>
-                </a>
-            </div>
-
-            <!-- Pengaturan -->
-            <div class="mt-8">
-                <h3 class="px-6 text-sm font-bold text-white/70 uppercase tracking-wider mb-4 flex items-center">
-                    <div class="w-1 h-4 bg-gradient-to-b from-indigo-400 to-purple-500 rounded-full mr-3 flex-shrink-0"></div>
-                    Pengaturan
-                </h3>
-                
-                <a href="#" class="nav-item flex items-center px-6 py-4 mb-3 rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
-                    <div class="w-6 h-6 mr-4 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                    </div>
-                    <span class="font-semibold">Pengaturan Sistem</span>
-                </a>
-
-                <a href="#" class="nav-item flex items-center px-6 py-4 mb-3 rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
-                    <div class="w-6 h-6 mr-4 bg-gradient-to-r from-gray-400 to-gray-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <span class="font-semibold">Bantuan & Support</span>
-                </a>
-
-                <a href="#" class="nav-item flex items-center px-6 py-4 mb-3 rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
-                    <div class="w-6 h-6 mr-4 bg-gradient-to-r from-teal-400 to-green-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
-                    </div>
-                    <span class="font-semibold">Panduan Aplikasi</span>
                 </a>
             </div>
 
