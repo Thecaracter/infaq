@@ -7,6 +7,8 @@ use App\Http\Controllers\TahunAjaranController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TagihanController;
+use App\Http\Controllers\CronController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -25,6 +27,15 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'check.role:admin,tu'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+
+    // Tagihan routes - untuk admin dan TU  
+    Route::prefix('tagihan')->name('tagihan.')->group(function () {
+        Route::get('/', [TagihanController::class, 'index'])->name('index');
+        Route::get('/siswa/{id}', [TagihanController::class, 'showSiswa'])->name('siswa.show');
+        Route::post('/pembayaran', [TagihanController::class, 'prosesPembayaran'])->name('pembayaran');
+        Route::post('/reminder/{siswa_id}', [TagihanController::class, 'kirimReminder'])->name('reminder');
+        Route::post('/reminder/{siswa_id}/{tunggakan_id}', [TagihanController::class, 'kirimReminder'])->name('reminder.single');
+    });
 });
 
 Route::middleware(['auth', 'check.role:admin'])->group(function () {
@@ -60,4 +71,19 @@ Route::middleware(['auth', 'check.role:admin'])->group(function () {
     Route::delete('/admin/user/{user}', [UserController::class, 'destroy'])->name('admin.user.destroy');
     Route::post('/admin/user/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('admin.user.toggle-active');
     Route::post('/admin/user/{user}/reset-password', [UserController::class, 'resetPassword'])->name('admin.user.reset-password');
+
+    // Tagihan management khusus admin
+    Route::prefix('tagihan')->name('tagihan.')->group(function () {
+        Route::post('/generate', [TagihanController::class, 'generateViaWeb'])->name('generate');
+        Route::post('/generate-ajax', [TagihanController::class, 'generateAjax'])->name('generate.ajax');
+        Route::post('/bulk-reminder', [TagihanController::class, 'bulkReminder'])->name('bulk.reminder');
+        Route::delete('/{id}', [TagihanController::class, 'destroy'])->name('destroy');
+    });
+});
+
+// Cron endpoints untuk shared hosting (tanpa auth)
+Route::prefix('cron')->group(function () {
+    Route::get('/generate-tagihan', [CronController::class, 'generateTagihan']);
+    Route::get('/kirim-reminder', [CronController::class, 'kirimReminder']);
+    Route::get('/status', [CronController::class, 'status']);
 });

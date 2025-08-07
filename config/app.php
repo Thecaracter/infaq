@@ -65,7 +65,7 @@ return [
     |
     */
 
-    'timezone' => env('APP_TIMEZONE', 'UTC'),
+    'timezone' => env('APP_TIMEZONE', 'Asia/Jakarta'),
 
     /*
     |--------------------------------------------------------------------------
@@ -122,5 +122,17 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cron Secret Key
+    |--------------------------------------------------------------------------
+    |
+    | Secret key untuk mengamankan endpoint cron job dari akses tidak sah.
+    | Key ini digunakan untuk validasi request ke endpoint cron.
+    |
+    */
+
+    'cron_secret' => env('CRON_SECRET', 'simaniis-secret-2024'),
 
 ];

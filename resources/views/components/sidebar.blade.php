@@ -87,82 +87,82 @@
                                     <span>Siswa</span>
                                 </div>
                             </a>
-                           
                         </div>
                     </div>
 
                     <!-- User Management -->
-                <a href="{{ route('admin.user.index') }}" class="nav-item flex items-center px-6 py-4 mb-3 rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
-    <div class="w-6 h-6 mr-4 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
-        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-1a4 4 0 00-4-4h-1M9 20H4v-1a4 4 0 014-4h1m4-2a4 4 0 100-8 4 4 0 000 8zm6 0a4 4 0 100-8 4 4 0 000 8z" />
-        </svg>
-    </div>
-    <span class="font-semibold">Kelola User</span>
-</a>
-
+                    <a href="{{ route('admin.user.index') }}" class="nav-item flex items-center px-3 sm:px-6 py-3 sm:py-4 mb-2 sm:mb-3 rounded-xl sm:rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20 {{ request()->routeIs('admin.user.*') ? 'bg-white/20 text-white shadow-lg' : '' }}">
+                        <div class="w-5 h-5 sm:w-6 sm:h-6 mr-3 sm:mr-4 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
+                            <svg class="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-1a4 4 0 00-4-4h-1M9 20H4v-1a4 4 0 014-4h1m4-2a4 4 0 100-8 4 4 0 000 8zm6 0a4 4 0 100-8 4 4 0 000 8z" />
+                            </svg>
+                        </div>
+                        <span class="font-semibold text-sm sm:text-base">Kelola User</span>
+                    </a>
                 </div>
             @endif
 
             <!-- Transaksi -->
-            <div class="mt-8">
-                <h3 class="px-6 text-sm font-bold text-white/70 uppercase tracking-wider mb-4 flex items-center">
-                    <div class="w-1 h-4 bg-gradient-to-b from-green-400 to-blue-500 rounded-full mr-3 flex-shrink-0"></div>
+            <div class="mt-4 sm:mt-8">
+                <h3 class="px-3 sm:px-6 text-xs sm:text-sm font-bold text-white/70 uppercase tracking-wider mb-2 sm:mb-4 flex items-center">
+                    <div class="w-1 h-3 sm:h-4 bg-gradient-to-b from-green-400 to-blue-500 rounded-full mr-2 sm:mr-3 flex-shrink-0"></div>
                     Transaksi
                 </h3>
                 
-                <a href="#" class="nav-item flex items-center px-6 py-4 mb-3 rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
-                    <div class="w-6 h-6 mr-4 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="{{ route('tagihan.index') }}" class="nav-item flex items-center px-3 sm:px-6 py-3 sm:py-4 mb-2 sm:mb-3 rounded-xl sm:rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20 {{ request()->routeIs('tagihan.*') ? 'bg-white/20 text-white shadow-lg' : '' }}">
+                    <div class="w-5 h-5 sm:w-6 sm:h-6 mr-3 sm:mr-4 bg-gradient-to-r from-red-400 to-pink-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M7 21h10a2 2 0 002-2V9a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <span class="font-semibold text-sm sm:text-base">Management Tagihan</span>
+                    @if(request()->routeIs('tagihan.*'))
+                        <div class="ml-auto w-2 h-2 bg-red-300 rounded-full pulse-dot flex-shrink-0"></div>
+                    @endif
+                </a>
+
+                <a href="#" class="nav-item flex items-center px-3 sm:px-6 py-3 sm:py-4 mb-2 sm:mb-3 rounded-xl sm:rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
+                    <div class="w-5 h-5 sm:w-6 sm:h-6 mr-3 sm:mr-4 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                         </svg>
                     </div>
-                    <span class="font-semibold">Input Pembayaran</span>
+                    <span class="font-semibold text-sm sm:text-base">Input Pembayaran</span>
                 </a>
 
-                <a href="#" class="nav-item flex items-center px-6 py-4 mb-3 rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
-                    <div class="w-6 h-6 mr-4 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="#" class="nav-item flex items-center px-3 sm:px-6 py-3 sm:py-4 mb-2 sm:mb-3 rounded-xl sm:rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
+                    <div class="w-5 h-5 sm:w-6 sm:h-6 mr-3 sm:mr-4 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                         </svg>
                     </div>
-                    <span class="font-semibold">Riwayat Pembayaran</span>
-                </a>
-
-                <a href="#" class="nav-item flex items-center px-6 py-4 mb-3 rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
-                    <div class="w-6 h-6 mr-4 bg-gradient-to-r from-red-400 to-pink-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                        </svg>
-                    </div>
-                    <span class="font-semibold">Data Tunggakan</span>
-                    <div class="ml-auto w-2 h-2 bg-red-400 rounded-full pulse-dot flex-shrink-0"></div>
+                    <span class="font-semibold text-sm sm:text-base">Riwayat Pembayaran</span>
                 </a>
             </div>
 
             <!-- Laporan -->
-            <div class="mt-8">
-                <h3 class="px-6 text-sm font-bold text-white/70 uppercase tracking-wider mb-4 flex items-center">
-                    <div class="w-1 h-4 bg-gradient-to-b from-orange-400 to-red-500 rounded-full mr-3 flex-shrink-0"></div>
+            <div class="mt-4 sm:mt-8">
+                <h3 class="px-3 sm:px-6 text-xs sm:text-sm font-bold text-white/70 uppercase tracking-wider mb-2 sm:mb-4 flex items-center">
+                    <div class="w-1 h-3 sm:h-4 bg-gradient-to-b from-orange-400 to-red-500 rounded-full mr-2 sm:mr-3 flex-shrink-0"></div>
                     Laporan
                 </h3>
                 
-                <a href="#" class="nav-item flex items-center px-6 py-4 mb-3 rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
-                    <div class="w-6 h-6 mr-4 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="#" class="nav-item flex items-center px-3 sm:px-6 py-3 sm:py-4 mb-2 sm:mb-3 rounded-xl sm:rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
+                    <div class="w-5 h-5 sm:w-6 sm:h-6 mr-3 sm:mr-4 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                         </svg>
                     </div>
-                    <span class="font-semibold">Laporan Keuangan</span>
+                    <span class="font-semibold text-sm sm:text-base">Laporan Keuangan</span>
                 </a>
 
-                <a href="#" class="nav-item flex items-center px-6 py-4 mb-3 rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
-                    <div class="w-6 h-6 mr-4 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
-                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a href="#" class="nav-item flex items-center px-3 sm:px-6 py-3 sm:py-4 mb-2 sm:mb-3 rounded-xl sm:rounded-2xl text-white/90 hover:bg-white/10 hover:text-white transition-all duration-300 backdrop-blur-sm border border-white/5 hover:border-white/20">
+                    <div class="w-5 h-5 sm:w-6 sm:h-6 mr-3 sm:mr-4 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center shadow-md flex-shrink-0">
+                        <svg class="w-3 h-3 sm:w-4 sm:h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
                     </div>
-                    <span class="font-semibold">Export Data</span>
+                    <span class="font-semibold text-sm sm:text-base">Export Data</span>
                 </a>
             </div>
 

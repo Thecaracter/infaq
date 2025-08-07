@@ -14,7 +14,6 @@ class TahunAjaran extends Model
         'tanggal_mulai',
         'tanggal_selesai',
         'is_active',
-        'nominal_infaq_bulanan',
     ];
 
     protected function casts(): array
@@ -23,7 +22,6 @@ class TahunAjaran extends Model
             'tanggal_mulai' => 'date',
             'tanggal_selesai' => 'date',
             'is_active' => 'boolean',
-            'nominal_infaq_bulanan' => 'decimal:2',
         ];
     }
 
@@ -43,5 +41,23 @@ class TahunAjaran extends Model
     public function siswas()
     {
         return $this->hasMany(Siswa::class);
+    }
+
+    // Accessor untuk durasi tahun ajaran dalam hari
+    public function getDurasiHariAttribute()
+    {
+        return $this->tanggal_mulai->diffInDays($this->tanggal_selesai);
+    }
+
+    // Accessor untuk status aktif dengan teks
+    public function getStatusTextAttribute()
+    {
+        return $this->is_active ? 'Aktif' : 'Tidak Aktif';
+    }
+
+    // Accessor untuk format periode
+    public function getPeriodeAttribute()
+    {
+        return $this->tanggal_mulai->format('d M Y') . ' - ' . $this->tanggal_selesai->format('d M Y');
     }
 }

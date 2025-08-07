@@ -10,7 +10,9 @@ return new class extends Migration {
         Schema::create('kelas', function (Blueprint $table) {
             $table->id();
             $table->string('nama_kelas');
-            $table->string('tingkat');
+            $table->integer('tingkat');
+            $table->enum('jenis_kelas', ['reguler', 'peminatan'])->default('reguler');
+            $table->decimal('nominal_bulanan', 10, 2);
             $table->foreignId('tahun_ajaran_id')->constrained('tahun_ajarans')->onDelete('cascade');
             $table->boolean('is_active')->default(true);
             $table->timestamps();

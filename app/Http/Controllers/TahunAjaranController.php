@@ -22,7 +22,6 @@ class TahunAjaranController extends Controller
             'nama_tahun' => 'required|string|max:255|unique:tahun_ajarans,nama_tahun',
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after:tanggal_mulai',
-            'nominal_infaq_bulanan' => 'required|numeric|min:0',
             'is_active' => 'nullable|boolean'
         ], [
             'nama_tahun.required' => 'Nama tahun ajaran harus diisi.',
@@ -30,9 +29,6 @@ class TahunAjaranController extends Controller
             'tanggal_mulai.required' => 'Tanggal mulai harus diisi.',
             'tanggal_selesai.required' => 'Tanggal selesai harus diisi.',
             'tanggal_selesai.after' => 'Tanggal selesai harus setelah tanggal mulai.',
-            'nominal_infaq_bulanan.required' => 'Nominal infaq bulanan harus diisi.',
-            'nominal_infaq_bulanan.numeric' => 'Nominal infaq bulanan harus berupa angka.',
-            'nominal_infaq_bulanan.min' => 'Nominal infaq bulanan tidak boleh negatif.',
         ]);
 
         DB::beginTransaction();
@@ -45,7 +41,6 @@ class TahunAjaranController extends Controller
                 'nama_tahun' => $request->nama_tahun,
                 'tanggal_mulai' => $request->tanggal_mulai,
                 'tanggal_selesai' => $request->tanggal_selesai,
-                'nominal_infaq_bulanan' => $request->nominal_infaq_bulanan,
                 'is_active' => $request->boolean('is_active', false)
             ]);
 
@@ -74,7 +69,6 @@ class TahunAjaranController extends Controller
                 'nama_tahun' => $tahunAjaran->nama_tahun,
                 'tanggal_mulai' => $tahunAjaran->tanggal_mulai->format('Y-m-d'),
                 'tanggal_selesai' => $tahunAjaran->tanggal_selesai->format('Y-m-d'),
-                'nominal_infaq_bulanan' => $tahunAjaran->nominal_infaq_bulanan,
                 'is_active' => $tahunAjaran->is_active
             ]
         ]);
@@ -91,7 +85,6 @@ class TahunAjaranController extends Controller
             ],
             'tanggal_mulai' => 'required|date',
             'tanggal_selesai' => 'required|date|after:tanggal_mulai',
-            'nominal_infaq_bulanan' => 'required|numeric|min:0',
             'is_active' => 'nullable|boolean'
         ], [
             'nama_tahun.required' => 'Nama tahun ajaran harus diisi.',
@@ -99,9 +92,6 @@ class TahunAjaranController extends Controller
             'tanggal_mulai.required' => 'Tanggal mulai harus diisi.',
             'tanggal_selesai.required' => 'Tanggal selesai harus diisi.',
             'tanggal_selesai.after' => 'Tanggal selesai harus setelah tanggal mulai.',
-            'nominal_infaq_bulanan.required' => 'Nominal infaq bulanan harus diisi.',
-            'nominal_infaq_bulanan.numeric' => 'Nominal infaq bulanan harus berupa angka.',
-            'nominal_infaq_bulanan.min' => 'Nominal infaq bulanan tidak boleh negatif.',
         ]);
 
         DB::beginTransaction();
@@ -116,7 +106,6 @@ class TahunAjaranController extends Controller
                 'nama_tahun' => $request->nama_tahun,
                 'tanggal_mulai' => $request->tanggal_mulai,
                 'tanggal_selesai' => $request->tanggal_selesai,
-                'nominal_infaq_bulanan' => $request->nominal_infaq_bulanan,
                 'is_active' => $request->boolean('is_active', false)
             ]);
 

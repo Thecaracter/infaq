@@ -14,7 +14,6 @@ class TahunAjaranSeeder extends Seeder
             'tanggal_mulai' => '2024-07-01',
             'tanggal_selesai' => '2025-06-30',
             'is_active' => true,
-            'nominal_infaq_bulanan' => 50000,
         ]);
 
         TahunAjaran::create([
@@ -22,7 +21,13 @@ class TahunAjaranSeeder extends Seeder
             'tanggal_mulai' => '2023-07-01',
             'tanggal_selesai' => '2024-06-30',
             'is_active' => false,
-            'nominal_infaq_bulanan' => 45000,
+        ]);
+
+        TahunAjaran::create([
+            'nama_tahun' => '2022/2023',
+            'tanggal_mulai' => '2022-07-01',
+            'tanggal_selesai' => '2023-06-30',
+            'is_active' => false,
         ]);
     }
 }

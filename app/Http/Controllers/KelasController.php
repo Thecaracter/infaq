@@ -27,15 +27,20 @@ class KelasController extends Controller
     {
         $request->validate([
             'nama_kelas' => 'required|string|max:255',
-            'tingkat' => 'required|integer|min:1|max:6',
+            'tingkat' => 'required|integer|in:10,11,12',
+            'jenis_kelas' => 'required|in:reguler,peminatan',
+            'nominal_bulanan' => 'required|numeric|min:0',
             'tahun_ajaran_id' => 'required|exists:tahun_ajarans,id',
             'is_active' => 'nullable|boolean'
         ], [
             'nama_kelas.required' => 'Nama kelas harus diisi.',
             'tingkat.required' => 'Tingkat kelas harus diisi.',
-            'tingkat.integer' => 'Tingkat kelas harus berupa angka.',
-            'tingkat.min' => 'Tingkat kelas minimal 1.',
-            'tingkat.max' => 'Tingkat kelas maksimal 6.',
+            'tingkat.in' => 'Tingkat kelas harus 10, 11, atau 12.',
+            'jenis_kelas.required' => 'Jenis kelas harus dipilih.',
+            'jenis_kelas.in' => 'Jenis kelas tidak valid.',
+            'nominal_bulanan.required' => 'Nominal bulanan harus diisi.',
+            'nominal_bulanan.numeric' => 'Nominal bulanan harus berupa angka.',
+            'nominal_bulanan.min' => 'Nominal bulanan tidak boleh negatif.',
             'tahun_ajaran_id.required' => 'Tahun ajaran harus dipilih.',
             'tahun_ajaran_id.exists' => 'Tahun ajaran tidak valid.',
         ]);
@@ -58,6 +63,8 @@ class KelasController extends Controller
             Kelas::create([
                 'nama_kelas' => $request->nama_kelas,
                 'tingkat' => $request->tingkat,
+                'jenis_kelas' => $request->jenis_kelas,
+                'nominal_bulanan' => $request->nominal_bulanan,
                 'tahun_ajaran_id' => $request->tahun_ajaran_id,
                 'is_active' => $request->boolean('is_active', true)
             ]);
@@ -83,6 +90,8 @@ class KelasController extends Controller
                 'id' => $kelas->id,
                 'nama_kelas' => $kelas->nama_kelas,
                 'tingkat' => $kelas->tingkat,
+                'jenis_kelas' => $kelas->jenis_kelas,
+                'nominal_bulanan' => $kelas->nominal_bulanan,
                 'tahun_ajaran_id' => $kelas->tahun_ajaran_id,
                 'is_active' => $kelas->is_active
             ]
@@ -93,15 +102,20 @@ class KelasController extends Controller
     {
         $request->validate([
             'nama_kelas' => 'required|string|max:255',
-            'tingkat' => 'required|integer|min:1|max:6',
+            'tingkat' => 'required|integer|in:10,11,12',
+            'jenis_kelas' => 'required|in:reguler,peminatan',
+            'nominal_bulanan' => 'required|numeric|min:0',
             'tahun_ajaran_id' => 'required|exists:tahun_ajarans,id',
             'is_active' => 'nullable|boolean'
         ], [
             'nama_kelas.required' => 'Nama kelas harus diisi.',
             'tingkat.required' => 'Tingkat kelas harus diisi.',
-            'tingkat.integer' => 'Tingkat kelas harus berupa angka.',
-            'tingkat.min' => 'Tingkat kelas minimal 1.',
-            'tingkat.max' => 'Tingkat kelas maksimal 6.',
+            'tingkat.in' => 'Tingkat kelas harus 10, 11, atau 12.',
+            'jenis_kelas.required' => 'Jenis kelas harus dipilih.',
+            'jenis_kelas.in' => 'Jenis kelas tidak valid.',
+            'nominal_bulanan.required' => 'Nominal bulanan harus diisi.',
+            'nominal_bulanan.numeric' => 'Nominal bulanan harus berupa angka.',
+            'nominal_bulanan.min' => 'Nominal bulanan tidak boleh negatif.',
             'tahun_ajaran_id.required' => 'Tahun ajaran harus dipilih.',
             'tahun_ajaran_id.exists' => 'Tahun ajaran tidak valid.',
         ]);
@@ -125,6 +139,8 @@ class KelasController extends Controller
             $kelas->update([
                 'nama_kelas' => $request->nama_kelas,
                 'tingkat' => $request->tingkat,
+                'jenis_kelas' => $request->jenis_kelas,
+                'nominal_bulanan' => $request->nominal_bulanan,
                 'tahun_ajaran_id' => $request->tahun_ajaran_id,
                 'is_active' => $request->boolean('is_active', true)
             ]);
@@ -189,5 +205,14 @@ class KelasController extends Controller
                 'message' => 'Gagal menghapus kelas. ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    // Method helper untuk mendapatkan options
+    public function getOptions()
+    {
+        return response()->json([
+            'tingkat_options' => Kelas::getTingkatOptions(),
+            'jenis_kelas_options' => Kelas::getJenisKelasOptions(),
+        ]);
     }
 }

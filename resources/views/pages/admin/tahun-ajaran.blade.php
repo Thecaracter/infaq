@@ -11,7 +11,10 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0">
                 <div>
                     <h2 class="text-xl sm:text-2xl font-bold text-secondary-900">Kelola Tahun Ajaran</h2>
-                    <p class="text-secondary-600 mt-1 text-sm sm:text-base">Manage tahun ajaran dan nominal infaq bulanan</p>
+                    <p class="text-secondary-600 mt-1 text-sm sm:text-base">Manage tahun ajaran akademik SMA</p>
+                    <p class="text-xs text-secondary-500 mt-1">
+                        <span class="font-medium">Catatan:</span> Nominal infaq diatur per kelas, bukan per tahun ajaran
+                    </p>
                 </div>
                 <button @click="openCreateModal" class="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-lg sm:rounded-xl hover:from-primary-600 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transform hover:-translate-y-0.5 transition-all duration-200 shadow-lg text-sm sm:text-base">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,7 +41,13 @@
                             Periode
                         </th>
                         <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-secondary-700 uppercase tracking-wider">
-                            Nominal Infaq
+                            Durasi
+                        </th>
+                        <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-secondary-700 uppercase tracking-wider">
+                            Total Kelas
+                        </th>
+                        <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-secondary-700 uppercase tracking-wider">
+                            Total Siswa
                         </th>
                         <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-secondary-700 uppercase tracking-wider">
                             Status
@@ -71,14 +80,32 @@
                                     {{ $tahunAjaran->tanggal_selesai->format('d M Y') }}
                                 </div>
                                 <div class="text-xs text-secondary-500">
-                                    {{ $tahunAjaran->tanggal_mulai->diffInDays($tahunAjaran->tanggal_selesai) }} hari
+                                    {{ $tahunAjaran->periode }}
                                 </div>
                             </td>
                             <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                                 <div class="text-sm font-semibold text-secondary-900">
-                                    Rp {{ number_format($tahunAjaran->nominal_infaq_bulanan, 0, ',', '.') }}
+                                    {{ $tahunAjaran->durasi_hari }} hari
                                 </div>
-                                <div class="text-xs text-secondary-500">per bulan</div>
+                                <div class="text-xs text-secondary-500">
+                                    (~{{ number_format($tahunAjaran->durasi_hari / 30, 1) }} bulan)
+                                </div>
+                            </td>
+                            <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                <div class="text-sm font-semibold text-secondary-900">
+                                    {{ $tahunAjaran->kelas()->count() }} kelas
+                                </div>
+                                <div class="text-xs text-secondary-500">
+                                    {{ $tahunAjaran->kelas()->where('is_active', true)->count() }} aktif
+                                </div>
+                            </td>
+                            <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                <div class="text-sm font-semibold text-secondary-900">
+                                    {{ $tahunAjaran->siswas()->count() }} siswa
+                                </div>
+                                <div class="text-xs text-secondary-500">
+                                    {{ $tahunAjaran->siswas()->where('is_active', true)->count() }} aktif
+                                </div>
                             </td>
                             <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                                 <button @click="toggleActive({{ $tahunAjaran->id }})" 
@@ -118,7 +145,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-4 sm:px-6 py-8 sm:py-12 text-center">
+                            <td colspan="7" class="px-4 sm:px-6 py-8 sm:py-12 text-center">
                                 <div class="w-12 h-12 sm:w-16 sm:h-16 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                                     <svg class="w-6 h-6 sm:w-8 sm:h-8 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 0h6m6 0V7a3 3 0 00-3-3H9a3 3 0 00-3 3v10a1 1 0 001 1h10a1 1 0 001-1V7z"></path>
@@ -183,13 +210,18 @@
                                 <p class="text-xs text-secondary-500">
                                     s/d {{ $tahunAjaran->tanggal_selesai->format('d M Y') }}
                                 </p>
+                                <p class="text-xs text-secondary-500 font-medium">
+                                    {{ $tahunAjaran->durasi_hari }} hari
+                                </p>
                             </div>
                             <div>
-                                <p class="text-xs text-secondary-600 font-medium">Nominal Infaq</p>
+                                <p class="text-xs text-secondary-600 font-medium">Data</p>
                                 <p class="text-sm text-secondary-900 font-bold">
-                                    Rp {{ number_format($tahunAjaran->nominal_infaq_bulanan, 0, ',', '.') }}
+                                    {{ $tahunAjaran->kelas()->count() }} kelas
                                 </p>
-                                <p class="text-xs text-secondary-500">per bulan</p>
+                                <p class="text-sm text-secondary-900 font-bold">
+                                    {{ $tahunAjaran->siswas()->count() }} siswa
+                                </p>
                             </div>
                         </div>
 
@@ -254,7 +286,7 @@
              x-transition:leave-end="opacity-0 transform scale-95"
              class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             
-            <form @submit.prevent="submitForm">>
+            <form @submit.prevent="submitForm">
                 <!-- Modal Header -->
                 <div class="p-6 border-b border-secondary-200">
                     <div class="flex items-center justify-between">
@@ -306,20 +338,17 @@
                         <div x-show="errors.tanggal_selesai" x-text="errors.tanggal_selesai" class="text-red-500 text-sm mt-1"></div>
                     </div>
 
-                    <!-- Nominal Infaq -->
-                    <div>
-                        <label for="nominal_infaq_bulanan" class="block text-sm font-semibold text-secondary-700 mb-2">
-                            Nominal Infaq Bulanan <span class="text-red-500">*</span>
-                        </label>
-                        <div class="relative">
-                            <span class="absolute left-4 top-3 text-secondary-500">Rp</span>
-                            <input type="number" 
-                                   x-model="formData.nominal_infaq_bulanan"
-                                   placeholder="50000"
-                                   :class="errors.nominal_infaq_bulanan ? 'border-red-500 ring-red-500' : 'border-secondary-300'"
-                                   class="w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                    <!-- Info Box -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-start space-x-2">
+                            <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div>
+                                <p class="text-sm font-medium text-blue-800">Informasi</p>
+                                <p class="text-sm text-blue-700">Nominal infaq bulanan akan diatur pada masing-masing kelas, bukan per tahun ajaran. Setiap kelas bisa memiliki nominal yang berbeda sesuai dengan tingkat dan jenis kelasnya.</p>
+                            </div>
                         </div>
-                        <div x-show="errors.nominal_infaq_bulanan" x-text="errors.nominal_infaq_bulanan" class="text-red-500 text-sm mt-1"></div>
                     </div>
 
                     <!-- Status Aktif -->
@@ -501,12 +530,11 @@ function tahunAjaranManager() {
             isDeleting: false
         },
         
-        // Form data
+        // Form data (removed nominal_infaq_bulanan)
         formData: {
             nama_tahun: '',
             tanggal_mulai: '',
             tanggal_selesai: '',
-            nominal_infaq_bulanan: '',
             is_active: false
         },
         
@@ -537,9 +565,8 @@ function tahunAjaranManager() {
                     // Fill form with proper date formatting
                     this.formData = {
                         nama_tahun: result.data.nama_tahun,
-                        tanggal_mulai: result.data.tanggal_mulai, // Already in YYYY-MM-DD format from API
-                        tanggal_selesai: result.data.tanggal_selesai, // Already in YYYY-MM-DD format from API
-                        nominal_infaq_bulanan: result.data.nominal_infaq_bulanan,
+                        tanggal_mulai: result.data.tanggal_mulai,
+                        tanggal_selesai: result.data.tanggal_selesai,
                         is_active: result.data.is_active
                     };
                     
@@ -564,7 +591,6 @@ function tahunAjaranManager() {
                 nama_tahun: '',
                 tanggal_mulai: '',
                 tanggal_selesai: '',
-                nominal_infaq_bulanan: '',
                 is_active: false
             };
             this.clearErrors();

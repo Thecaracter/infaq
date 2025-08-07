@@ -12,6 +12,8 @@ return new class extends Migration {
             $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
             $table->string('bulan_tunggakan');
             $table->decimal('nominal', 10, 2);
+            $table->decimal('nominal_kelas', 10, 2);
+            $table->string('jenis_kelas', 20);
             $table->boolean('is_lunas')->default(false);
             $table->date('tanggal_jatuh_tempo');
             $table->boolean('notifikasi_sent')->default(false);

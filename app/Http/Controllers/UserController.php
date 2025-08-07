@@ -11,7 +11,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        // Hanya tampilkan user dengan role 'tu' (Tata Usaha)
+
         $users = User::where('role', 'tu')->latest()->paginate(10);
 
         return view('pages.admin.user', compact('users'));
@@ -23,7 +23,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|in:tu', // Hanya bisa menambah role TU
+            'role' => 'required|in:tu',
             'is_active' => 'nullable|boolean'
         ], [
             'name.required' => 'Nama harus diisi.',
@@ -42,7 +42,7 @@ class UserController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'role' => 'tu', // Paksa role menjadi TU
+                'role' => 'tu',
                 'is_active' => $request->boolean('is_active', true)
             ]);
 
@@ -61,7 +61,7 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        // Hanya bisa melihat user dengan role TU
+
         if ($user->role !== 'tu') {
             return response()->json([
                 'success' => false,
@@ -84,7 +84,7 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        // Hanya bisa edit user dengan role TU
+
         if ($user->role !== 'tu') {
             return response()->json([
                 'success' => false,
@@ -102,7 +102,7 @@ class UserController extends Controller
                 Rule::unique('users', 'email')->ignore($user->id)
             ],
             'password' => 'nullable|string|min:6|confirmed',
-            'role' => 'required|in:tu', // Hanya bisa role TU
+            'role' => 'required|in:tu',
             'is_active' => 'nullable|boolean'
         ], [
             'name.required' => 'Nama harus diisi.',
@@ -119,11 +119,11 @@ class UserController extends Controller
             $updateData = [
                 'name' => $request->name,
                 'email' => $request->email,
-                'role' => 'tu', // Paksa role tetap TU
+                'role' => 'tu',
                 'is_active' => $request->boolean('is_active', true)
             ];
 
-            // Only update password if provided
+
             if ($request->filled('password')) {
                 $updateData['password'] = Hash::make($request->password);
             }
@@ -145,7 +145,7 @@ class UserController extends Controller
 
     public function toggleActive(User $user)
     {
-        // Hanya bisa toggle user dengan role TU
+
         if ($user->role !== 'tu') {
             return response()->json([
                 'success' => false,
@@ -177,7 +177,7 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         try {
-            // Prevent deleting admin users
+
             if ($user->role === 'admin') {
                 return response()->json([
                     'success' => false,
@@ -185,7 +185,7 @@ class UserController extends Controller
                 ], 422);
             }
 
-            // Prevent deleting self
+
             if ($user->id === auth()->id()) {
                 return response()->json([
                     'success' => false,
@@ -193,7 +193,7 @@ class UserController extends Controller
                 ], 422);
             }
 
-            // Check if user has transactions (if you want to prevent deletion)
+
             if ($user->transaksiInfaqs()->count() > 0) {
                 return response()->json([
                     'success' => false,
@@ -219,7 +219,7 @@ class UserController extends Controller
     public function resetPassword(User $user)
     {
         try {
-            // Prevent resetting own password
+
             if ($user->id === auth()->id()) {
                 return response()->json([
                     'success' => false,
@@ -227,8 +227,8 @@ class UserController extends Controller
                 ], 422);
             }
 
-            // Generate new random password
-            $newPassword = 'password123'; // You can make this more random if needed
+
+            $newPassword = 'password123';
 
             $user->update([
                 'password' => Hash::make($newPassword)

@@ -9,11 +9,10 @@ return new class extends Migration {
     {
         Schema::create('tahun_ajarans', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_tahun'); // 2024/2025
+            $table->string('nama_tahun');
             $table->date('tanggal_mulai');
             $table->date('tanggal_selesai');
             $table->boolean('is_active')->default(false);
-            $table->decimal('nominal_infaq_bulanan', 10, 2);
             $table->timestamps();
         });
     }

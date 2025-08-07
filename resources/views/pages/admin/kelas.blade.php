@@ -10,98 +10,9 @@
         <div class="p-4 sm:p-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0">
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-bold text-secondary-900">Kelola Kelas</h2>
-                    <p class="text-secondary-600 mt-1 text-sm sm:text-base">Manage kelas per tahun ajaran</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-secondary-900">Kelola Kelas SMA</h2>
+                    <p class="text-secondary-600 mt-1 text-sm sm:text-base">Manage kelas reguler dan peminatan dengan nominal masing-masing</p>
                 </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div x-show="deleteConfirm.show" 
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         @click.away="cancelDelete" 
-         @keydown.escape.window="cancelDelete"
-         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" 
-         style="display: none;">
-        
-        <div x-show="deleteConfirm.show"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 transform scale-95"
-             x-transition:enter-end="opacity-100 transform scale-100"
-             x-transition:leave="transition ease-in duration-200"
-             x-transition:leave-start="opacity-100 transform scale-100"
-             x-transition:leave-end="opacity-0 transform scale-95"
-             class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            
-            <!-- Modal Header -->
-            <div class="p-6 border-b border-secondary-200">
-                <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-secondary-900">Konfirmasi Hapus</h3>
-                        <p class="text-sm text-secondary-600">Tindakan ini tidak dapat dibatalkan</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal Body -->
-            <div class="p-6">
-                <p class="text-secondary-700 mb-2">
-                    Apakah Anda yakin ingin menghapus kelas:
-                </p>
-                <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
-                    <p class="font-semibold text-red-800" x-text="deleteConfirm.nama"></p>
-                </div>
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                    <div class="flex items-start space-x-2">
-                        <svg class="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                        </svg>
-                        <div>
-                            <p class="text-sm font-medium text-yellow-800">Peringatan!</p>
-                            <p class="text-sm text-yellow-700">Data kelas yang dihapus tidak dapat dikembalikan. Pastikan kelas tidak memiliki siswa.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="p-6 border-t border-secondary-200">
-                <div class="flex space-x-3">
-                    <button type="button" @click="cancelDelete" 
-                        :disabled="deleteConfirm.isDeleting"
-                        class="flex-1 px-4 py-3 border border-secondary-300 text-secondary-700 rounded-xl hover:bg-secondary-50 transition-all duration-200 font-medium">
-                        Batal
-                    </button>
-                    <button @click="confirmDelete" 
-                        :disabled="deleteConfirm.isDeleting"
-                        :class="deleteConfirm.isDeleting ? 'opacity-50 cursor-not-allowed' : 'hover:from-red-600 hover:to-red-700'"
-                        class="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl transition-all duration-200 font-medium">
-                        <span x-show="!deleteConfirm.isDeleting" class="flex items-center justify-center">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                            Ya, Hapus
-                        </span>
-                        <span x-show="deleteConfirm.isDeleting" class="flex items-center justify-center">
-                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Menghapus...
-                        </span>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
                 <button @click="openCreateModal" class="inline-flex items-center px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-lg sm:rounded-xl hover:from-primary-600 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transform hover:-translate-y-0.5 transition-all duration-200 shadow-lg text-sm sm:text-base">
                     <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
@@ -121,16 +32,22 @@
                 <thead class="bg-secondary-50">
                     <tr>
                         <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-secondary-700 uppercase tracking-wider">
-                            Nama Kelas
+                            Kelas
                         </th>
                         <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-secondary-700 uppercase tracking-wider">
                             Tingkat
                         </th>
                         <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-secondary-700 uppercase tracking-wider">
+                            Jenis
+                        </th>
+                        <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-secondary-700 uppercase tracking-wider">
+                            Nominal Bulanan
+                        </th>
+                        <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-secondary-700 uppercase tracking-wider">
                             Tahun Ajaran
                         </th>
                         <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-secondary-700 uppercase tracking-wider">
-                            Jumlah Siswa
+                            Siswa
                         </th>
                         <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-secondary-700 uppercase tracking-wider">
                             Status
@@ -158,8 +75,22 @@
                             </td>
                             <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                                 <div class="inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                                    Kelas {{ $kelasItem->tingkat }}
+                                    Kelas {{ $kelasItem->tingkat_sma }}
                                 </div>
+                            </td>
+                            <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                <div class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full
+                                    {{ $kelasItem->jenis_kelas === 'reguler' 
+                                        ? 'bg-green-100 text-green-800' 
+                                        : 'bg-purple-100 text-purple-800' }}">
+                                    {{ $kelasItem->jenis_kelas === 'reguler' ? 'Reguler' : 'Peminatan' }}
+                                </div>
+                            </td>
+                            <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                <div class="text-sm font-semibold text-primary-600">
+                                    {{ $kelasItem->nominal_format }}
+                                </div>
+                                <div class="text-xs text-secondary-500">per bulan</div>
                             </td>
                             <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                                 <div class="text-sm text-secondary-900 font-medium">{{ $kelasItem->tahunAjaran->nama_tahun }}</div>
@@ -169,8 +100,9 @@
                             </td>
                             <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                                 <div class="text-sm font-semibold text-secondary-900">
-                                    {{ $kelasItem->siswas()->count() }} Siswa
+                                    {{ $kelasItem->siswas()->count() }}
                                 </div>
+                                <div class="text-xs text-secondary-500">siswa</div>
                             </td>
                             <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
                                 <button @click="toggleActive({{ $kelasItem->id }})" 
@@ -210,7 +142,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 sm:px-6 py-8 sm:py-12 text-center">
+                            <td colspan="8" class="px-4 sm:px-6 py-8 sm:py-12 text-center">
                                 <div class="w-12 h-12 sm:w-16 sm:h-16 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
                                     <svg class="w-6 h-6 sm:w-8 sm:h-8 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
@@ -240,7 +172,15 @@
                                 </div>
                                 <div class="min-w-0 flex-1">
                                     <h3 class="font-semibold text-secondary-900 truncate">{{ $kelasItem->nama_kelas }}</h3>
-                                    <p class="text-xs text-blue-600 font-medium">Kelas {{ $kelasItem->tingkat }}</p>
+                                    <p class="text-xs text-blue-600 font-medium">Kelas {{ $kelasItem->tingkat_sma }}</p>
+                                    <div class="flex items-center space-x-2 mt-1">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full
+                                            {{ $kelasItem->jenis_kelas === 'reguler' 
+                                                ? 'bg-green-100 text-green-800' 
+                                                : 'bg-purple-100 text-purple-800' }}">
+                                            {{ $kelasItem->jenis_kelas === 'reguler' ? 'Reguler' : 'Peminatan' }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                             <button @click="toggleActive({{ $kelasItem->id }})" 
@@ -267,17 +207,23 @@
                         <!-- Info Grid -->
                         <div class="grid grid-cols-2 gap-3 mb-4">
                             <div>
-                                <p class="text-xs text-secondary-600 font-medium">Tahun Ajaran</p>
-                                <p class="text-sm text-secondary-900 font-semibold">{{ $kelasItem->tahunAjaran->nama_tahun }}</p>
-                                <p class="text-xs text-secondary-500">
-                                    {{ $kelasItem->tahunAjaran->is_active ? 'Aktif' : 'Tidak Aktif' }}
-                                </p>
+                                <p class="text-xs text-secondary-600 font-medium">Nominal Bulanan</p>
+                                <p class="text-sm text-primary-600 font-bold">{{ $kelasItem->nominal_format }}</p>
+                                <p class="text-xs text-secondary-500">per bulan</p>
                             </div>
                             <div>
                                 <p class="text-xs text-secondary-600 font-medium">Jumlah Siswa</p>
                                 <p class="text-sm text-secondary-900 font-bold">{{ $kelasItem->siswas()->count() }} Siswa</p>
                                 <p class="text-xs text-secondary-500">terdaftar</p>
                             </div>
+                        </div>
+
+                        <div class="bg-white rounded-lg p-3 border border-secondary-200 mb-4">
+                            <p class="text-xs text-secondary-600 font-medium mb-1">Tahun Ajaran</p>
+                            <p class="text-sm text-secondary-900 font-semibold">{{ $kelasItem->tahunAjaran->nama_tahun }}</p>
+                            <p class="text-xs text-secondary-500">
+                                {{ $kelasItem->tahunAjaran->is_active ? 'Aktif' : 'Tidak Aktif' }}
+                            </p>
                         </div>
 
                         <!-- Actions -->
@@ -416,7 +362,7 @@
                         </label>
                         <input type="text" 
                                x-model="formData.nama_kelas"
-                               placeholder="contoh: 1A, 2B, 3C"
+                               placeholder="contoh: X-IPA-1, XI-IPS-2, XII-BAHASA"
                                :class="errors.nama_kelas ? 'border-red-500 ring-red-500' : 'border-secondary-300'"
                                class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
                         <div x-show="errors.nama_kelas" x-text="errors.nama_kelas" class="text-red-500 text-sm mt-1"></div>
@@ -431,14 +377,49 @@
                                 :class="errors.tingkat ? 'border-red-500 ring-red-500' : 'border-secondary-300'"
                                 class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
                             <option value="">Pilih Tingkat</option>
-                            <option value="1">Kelas 1</option>
-                            <option value="2">Kelas 2</option>
-                            <option value="3">Kelas 3</option>
-                            <option value="4">Kelas 4</option>
-                            <option value="5">Kelas 5</option>
-                            <option value="6">Kelas 6</option>
+                            <option value="10">Kelas X</option>
+                            <option value="11">Kelas XI</option>
+                            <option value="12">Kelas XII</option>
                         </select>
                         <div x-show="errors.tingkat" x-text="errors.tingkat" class="text-red-500 text-sm mt-1"></div>
+                    </div>
+
+                    <!-- Jenis Kelas -->
+                    <div>
+                        <label for="jenis_kelas" class="block text-sm font-semibold text-secondary-700 mb-2">
+                            Jenis Kelas <span class="text-red-500">*</span>
+                        </label>
+                        <select x-model="formData.jenis_kelas"
+                                :class="errors.jenis_kelas ? 'border-red-500 ring-red-500' : 'border-secondary-300'"
+                                class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                            <option value="">Pilih Jenis Kelas</option>
+                            <option value="reguler">Reguler</option>
+                            <option value="peminatan">Peminatan</option>
+                        </select>
+                        <div x-show="errors.jenis_kelas" x-text="errors.jenis_kelas" class="text-red-500 text-sm mt-1"></div>
+                        <p class="text-xs text-secondary-500 mt-1">
+                            <strong>Reguler:</strong> Kelas X (umum) | 
+                            <strong>Peminatan:</strong> Kelas XI & XII (jurusan)
+                        </p>
+                    </div>
+
+                    <!-- Nominal Bulanan -->
+                    <div>
+                        <label for="nominal_bulanan" class="block text-sm font-semibold text-secondary-700 mb-2">
+                            Nominal Bulanan <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-3 text-secondary-500">Rp</span>
+                            <input type="number" 
+                                   x-model="formData.nominal_bulanan"
+                                   placeholder="150000"
+                                   :class="errors.nominal_bulanan ? 'border-red-500 ring-red-500' : 'border-secondary-300'"
+                                   class="w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                        </div>
+                        <div x-show="errors.nominal_bulanan" x-text="errors.nominal_bulanan" class="text-red-500 text-sm mt-1"></div>
+                        <p class="text-xs text-secondary-500 mt-1">
+                            <strong>Saran:</strong> Kelas X: 150.000 | Kelas XI: 200.000 | Kelas XII: 250.000
+                        </p>
                     </div>
 
                     <!-- Tahun Ajaran -->
@@ -497,6 +478,95 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div x-show="deleteConfirm.show" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click.away="cancelDelete" 
+         @keydown.escape.window="cancelDelete"
+         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" 
+         style="display: none;">
+        
+        <div x-show="deleteConfirm.show"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform scale-95"
+             x-transition:enter-end="opacity-100 transform scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 transform scale-100"
+             x-transition:leave-end="opacity-0 transform scale-95"
+             class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-secondary-200">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-secondary-900">Konfirmasi Hapus</h3>
+                        <p class="text-sm text-secondary-600">Tindakan ini tidak dapat dibatalkan</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6">
+                <p class="text-secondary-700 mb-2">
+                    Apakah Anda yakin ingin menghapus kelas:
+                </p>
+                <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                    <p class="font-semibold text-red-800" x-text="deleteConfirm.nama"></p>
+                </div>
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <div class="flex items-start space-x-2">
+                        <svg class="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-medium text-yellow-800">Peringatan!</p>
+                            <p class="text-sm text-yellow-700">Data kelas yang dihapus tidak dapat dikembalikan. Pastikan kelas tidak memiliki siswa.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-6 border-t border-secondary-200">
+                <div class="flex space-x-3">
+                    <button type="button" @click="cancelDelete" 
+                        :disabled="deleteConfirm.isDeleting"
+                        class="flex-1 px-4 py-3 border border-secondary-300 text-secondary-700 rounded-xl hover:bg-secondary-50 transition-all duration-200 font-medium">
+                        Batal
+                    </button>
+                    <button @click="confirmDelete" 
+                        :disabled="deleteConfirm.isDeleting"
+                        :class="deleteConfirm.isDeleting ? 'opacity-50 cursor-not-allowed' : 'hover:from-red-600 hover:to-red-700'"
+                        class="flex-1 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl transition-all duration-200 font-medium">
+                        <span x-show="!deleteConfirm.isDeleting" class="flex items-center justify-center">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Ya, Hapus
+                        </span>
+                        <span x-show="deleteConfirm.isDeleting" class="flex items-center justify-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Menghapus...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification Toast -->
     <div x-show="showNotification"
          x-transition:enter="transition ease-out duration-300 transform"
@@ -551,6 +621,8 @@ function kelasManager() {
         formData: {
             nama_kelas: '',
             tingkat: '',
+            jenis_kelas: '',
+            nominal_bulanan: '',
             tahun_ajaran_id: '',
             is_active: true
         },
@@ -583,6 +655,8 @@ function kelasManager() {
                     this.formData = {
                         nama_kelas: result.data.nama_kelas,
                         tingkat: result.data.tingkat.toString(),
+                        jenis_kelas: result.data.jenis_kelas,
+                        nominal_bulanan: result.data.nominal_bulanan,
                         tahun_ajaran_id: result.data.tahun_ajaran_id.toString(),
                         is_active: result.data.is_active
                     };
@@ -607,6 +681,8 @@ function kelasManager() {
             this.formData = {
                 nama_kelas: '',
                 tingkat: '',
+                jenis_kelas: '',
+                nominal_bulanan: '',
                 tahun_ajaran_id: '',
                 is_active: true
             };

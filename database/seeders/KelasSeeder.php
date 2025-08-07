@@ -13,24 +13,109 @@ class KelasSeeder extends Seeder
         $tahunAjaranAktif = TahunAjaran::where('is_active', true)->first();
 
         $kelasList = [
-            ['nama_kelas' => '1A', 'tingkat' => '1'],
-            ['nama_kelas' => '1B', 'tingkat' => '1'],
-            ['nama_kelas' => '2A', 'tingkat' => '2'],
-            ['nama_kelas' => '2B', 'tingkat' => '2'],
-            ['nama_kelas' => '3A', 'tingkat' => '3'],
-            ['nama_kelas' => '3B', 'tingkat' => '3'],
-            ['nama_kelas' => '4A', 'tingkat' => '4'],
-            ['nama_kelas' => '4B', 'tingkat' => '4'],
-            ['nama_kelas' => '5A', 'tingkat' => '5'],
-            ['nama_kelas' => '5B', 'tingkat' => '5'],
-            ['nama_kelas' => '6A', 'tingkat' => '6'],
-            ['nama_kelas' => '6B', 'tingkat' => '6'],
+            // Kelas X (10)
+            [
+                'nama_kelas' => 'X-IPA-1',
+                'tingkat' => 10,
+                'jenis_kelas' => 'reguler',
+                'nominal_bulanan' => 150000
+            ],
+            [
+                'nama_kelas' => 'X-IPA-2',
+                'tingkat' => 10,
+                'jenis_kelas' => 'reguler',
+                'nominal_bulanan' => 150000
+            ],
+            [
+                'nama_kelas' => 'X-IPS-1',
+                'tingkat' => 10,
+                'jenis_kelas' => 'reguler',
+                'nominal_bulanan' => 150000
+            ],
+            [
+                'nama_kelas' => 'X-IPS-2',
+                'tingkat' => 10,
+                'jenis_kelas' => 'reguler',
+                'nominal_bulanan' => 150000
+            ],
+            [
+                'nama_kelas' => 'X-BAHASA',
+                'tingkat' => 10,
+                'jenis_kelas' => 'reguler',
+                'nominal_bulanan' => 150000
+            ],
+
+            // Kelas XI (11)
+            [
+                'nama_kelas' => 'XI-IPA-1',
+                'tingkat' => 11,
+                'jenis_kelas' => 'peminatan',
+                'nominal_bulanan' => 200000
+            ],
+            [
+                'nama_kelas' => 'XI-IPA-2',
+                'tingkat' => 11,
+                'jenis_kelas' => 'peminatan',
+                'nominal_bulanan' => 200000
+            ],
+            [
+                'nama_kelas' => 'XI-IPS-1',
+                'tingkat' => 11,
+                'jenis_kelas' => 'peminatan',
+                'nominal_bulanan' => 200000
+            ],
+            [
+                'nama_kelas' => 'XI-IPS-2',
+                'tingkat' => 11,
+                'jenis_kelas' => 'peminatan',
+                'nominal_bulanan' => 200000
+            ],
+            [
+                'nama_kelas' => 'XI-BAHASA',
+                'tingkat' => 11,
+                'jenis_kelas' => 'peminatan',
+                'nominal_bulanan' => 200000
+            ],
+
+            // Kelas XII (12)
+            [
+                'nama_kelas' => 'XII-IPA-1',
+                'tingkat' => 12,
+                'jenis_kelas' => 'peminatan',
+                'nominal_bulanan' => 250000
+            ],
+            [
+                'nama_kelas' => 'XII-IPA-2',
+                'tingkat' => 12,
+                'jenis_kelas' => 'peminatan',
+                'nominal_bulanan' => 250000
+            ],
+            [
+                'nama_kelas' => 'XII-IPS-1',
+                'tingkat' => 12,
+                'jenis_kelas' => 'peminatan',
+                'nominal_bulanan' => 250000
+            ],
+            [
+                'nama_kelas' => 'XII-IPS-2',
+                'tingkat' => 12,
+                'jenis_kelas' => 'peminatan',
+                'nominal_bulanan' => 250000
+            ],
+            [
+                'nama_kelas' => 'XII-BAHASA',
+                'tingkat' => 12,
+                'jenis_kelas' => 'peminatan',
+                'nominal_bulanan' => 250000
+            ],
         ];
 
         foreach ($kelasList as $kelas) {
             Kelas::create([
                 'nama_kelas' => $kelas['nama_kelas'],
                 'tingkat' => $kelas['tingkat'],
+                'jenis_kelas' => $kelas['jenis_kelas'],
+                'nominal_bulanan' => $kelas['nominal_bulanan'],
                 'tahun_ajaran_id' => $tahunAjaranAktif->id,
                 'is_active' => true,
             ]);
