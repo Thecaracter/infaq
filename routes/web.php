@@ -8,6 +8,7 @@ use App\Http\Controllers\KelasController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TagihanController;
+use App\Http\Controllers\RiwayatController; // TAMBAH INI
 use App\Http\Controllers\CronController;
 
 Route::get('/', function () {
@@ -35,6 +36,15 @@ Route::middleware(['auth', 'check.role:admin,tu'])->group(function () {
         Route::post('/pembayaran', [TagihanController::class, 'prosesPembayaran'])->name('pembayaran');
         Route::post('/reminder/{siswa_id}', [TagihanController::class, 'kirimReminder'])->name('reminder');
         Route::post('/reminder/{siswa_id}/{tunggakan_id}', [TagihanController::class, 'kirimReminder'])->name('reminder.single');
+    });
+
+    // RIWAYAT PEMBAYARAN ROUTES - TAMBAH INI
+    Route::prefix('riwayat')->name('riwayat.')->group(function () {
+        Route::get('/', [RiwayatController::class, 'index'])->name('index');
+        Route::get('/{id}', [RiwayatController::class, 'show'])->name('show')->where('id', '[0-9]+');
+        Route::post('/export', [RiwayatController::class, 'export'])->name('export');
+        Route::get('/{id}/print', [RiwayatController::class, 'print'])->name('print')->where('id', '[0-9]+');
+        Route::post('/{id}/resend-whatsapp', [RiwayatController::class, 'resendWhatsapp'])->name('resend-whatsapp')->where('id', '[0-9]+');
     });
 });
 
@@ -79,6 +89,7 @@ Route::middleware(['auth', 'check.role:admin'])->group(function () {
         Route::post('/bulk-reminder', [TagihanController::class, 'bulkReminder'])->name('bulk.reminder');
         Route::delete('/{id}', [TagihanController::class, 'destroy'])->name('destroy');
     });
+
 });
 
 // Cron endpoints untuk shared hosting (tanpa auth)
