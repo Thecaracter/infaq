@@ -4,15 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Kelas extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'nama_kelas',
         'tingkat',
         'jenis_kelas',
+        'peminatan',
         'nominal_bulanan',
         'tahun_ajaran_id',
         'is_active',
@@ -26,43 +28,36 @@ class Kelas extends Model
         ];
     }
 
-
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
     }
-
 
     public function scopeReguler($query)
     {
         return $query->where('jenis_kelas', 'reguler');
     }
 
-
     public function scopePeminatan($query)
     {
         return $query->where('jenis_kelas', 'peminatan');
     }
-
 
     public function tahunAjaran()
     {
         return $this->belongsTo(TahunAjaran::class);
     }
 
-
     public function siswas()
     {
         return $this->hasMany(Siswa::class);
     }
-
 
     public function getNamaLengkapAttribute()
     {
         $jenis = $this->jenis_kelas === 'reguler' ? 'Reguler' : 'Peminatan';
         return "{$this->nama_kelas} ({$jenis})";
     }
-
 
     public function getTingkatSmaAttribute()
     {
@@ -74,12 +69,10 @@ class Kelas extends Model
         };
     }
 
-
     public function getNominalFormatAttribute()
     {
         return 'Rp ' . number_format($this->nominal_bulanan, 0, ',', '.');
     }
-
 
     public static function getTingkatOptions()
     {
@@ -89,7 +82,6 @@ class Kelas extends Model
             12 => 'Kelas XII',
         ];
     }
-
 
     public static function getJenisKelasOptions()
     {

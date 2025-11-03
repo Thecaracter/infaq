@@ -4,7 +4,7 @@
 @section('page-title', 'Kelola Siswa')
 
 @section('content')
-<div x-data="siswaManager()" class="space-y-4 sm:space-y-6">
+<div x-data="siswaManager()" x-init="init()" class="space-y-4 sm:space-y-6">
     <!-- Header with Add Button -->
     <div class="bg-white overflow-hidden shadow-xl rounded-xl sm:rounded-2xl border border-secondary-200">
         <div class="p-4 sm:p-6">
@@ -24,8 +24,36 @@
         </div>
     </div>
 
+    <!-- Tab Navigation -->
+    <div class="bg-white rounded-xl sm:rounded-2xl border border-secondary-200 overflow-hidden">
+        <div class="border-b border-secondary-200">
+            <nav class="flex space-x-8 px-4 sm:px-6" aria-label="Tabs">
+                <button @click="activeTab = 'active'; loadActiveData()" 
+                        :class="activeTab === 'active' ? 'border-primary-500 text-primary-600' : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300'"
+                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                        Data Aktif
+                    </span>
+                </button>
+                <button @click="activeTab = 'trash'; loadTrashedData()" 
+                        :class="activeTab === 'trash' ? 'border-red-500 text-red-600' : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300'"
+                        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Sampah (<span x-text="trashedCount">0</span>)
+                    </span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
     <!-- Table -->
-    <div class="bg-white overflow-hidden shadow-xl rounded-xl sm:rounded-2xl border border-secondary-200">
+    <div x-show="activeTab === 'active'" class="bg-white overflow-hidden shadow-xl rounded-xl sm:rounded-2xl border border-secondary-200">
         <!-- Desktop Table -->
         <div class="hidden lg:block overflow-x-auto">
             <table class="min-w-full divide-y divide-secondary-200">
@@ -284,6 +312,118 @@
         @endif
     </div>
 
+    <!-- Trash Table -->
+    <div x-show="activeTab === 'trash'" class="bg-white overflow-hidden shadow-xl rounded-xl sm:rounded-2xl border border-secondary-200">
+        <div x-show="loading" class="p-8 text-center">
+            <div class="flex items-center justify-center space-x-2">
+                <svg class="animate-spin h-5 w-5 text-primary-500" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Memuat data sampah...</span>
+            </div>
+        </div>
+
+        <div x-show="!loading">
+            <!-- Desktop Trash Table -->
+            <div class="hidden lg:block overflow-x-auto">
+                <table class="min-w-full divide-y divide-secondary-200">
+                    <thead class="bg-red-50">
+                        <tr>
+                            <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-red-700 uppercase tracking-wider">
+                                Siswa (Dihapus)
+                            </th>
+                            <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-red-700 uppercase tracking-wider">
+                                Kelas
+                            </th>
+                            <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-red-700 uppercase tracking-wider">
+                                Orang Tua
+                            </th>
+                            <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-red-700 uppercase tracking-wider">
+                                Dihapus Pada
+                            </th>
+                            <th class="px-4 sm:px-6 py-3 sm:py-4 text-right text-xs font-bold text-red-700 uppercase tracking-wider">
+                                Aksi
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-secondary-200">
+                        <template x-for="siswa in trashedData.data" :key="siswa.id">
+                            <tr class="hover:bg-red-50 transition-colors">
+                                <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-red-400 to-red-600 rounded-full flex items-center justify-center flex-shrink-0 opacity-60">
+                                            <span class="text-white font-bold text-xs sm:text-sm" x-text="siswa.nama_lengkap.charAt(0)"></span>
+                                        </div>
+                                        <div class="ml-3 sm:ml-4">
+                                            <div class="text-sm font-medium text-red-800" x-text="siswa.nama_lengkap"></div>
+                                            <div class="text-xs text-red-600" x-text="siswa.nis"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs bg-red-100 text-red-700 rounded-full" x-text="siswa.kelas?.nama_kelas || 'N/A'"></span>
+                                </td>
+                                <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                    <div class="text-sm text-red-800" x-text="siswa.orang_tua?.nama_wali || '-'"></div>
+                                    <div class="text-xs text-red-600" x-text="siswa.orang_tua?.no_hp || '-'"></div>
+                                </td>
+                                <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                    <div class="text-sm text-red-800" x-text="new Date(siswa.deleted_at).toLocaleDateString('id-ID')"></div>
+                                </td>
+                                <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <button @click="restoreSiswa(siswa.id, siswa.nama_lengkap)" 
+                                        class="inline-flex items-center px-2 sm:px-3 py-1 sm:py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-all duration-200">
+                                        <svg class="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                        </svg>
+                                        Pulihkan
+                                    </button>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Trash Cards -->
+            <div class="lg:hidden">
+                <template x-for="siswa in trashedData.data" :key="siswa.id">
+                    <div class="p-4 border-b border-red-200 bg-red-50">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-gradient-to-r from-red-400 to-red-600 rounded-full flex items-center justify-center opacity-60">
+                                    <span class="text-white font-bold text-sm" x-text="siswa.nama_lengkap.charAt(0)"></span>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-red-800" x-text="siswa.nama_lengkap"></div>
+                                    <div class="text-xs text-red-600" x-text="siswa.nis + ' • ' + (siswa.kelas?.nama_kelas || 'N/A')"></div>
+                                    <div class="text-xs text-red-500 mt-1">Dihapus: <span x-text="new Date(siswa.deleted_at).toLocaleDateString('id-ID')"></span></div>
+                                </div>
+                            </div>
+                            <button @click="restoreSiswa(siswa.id, siswa.nama_lengkap)" 
+                                class="inline-flex items-center px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-all duration-200 text-xs">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                Pulihkan
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Empty Trash State -->
+            <div x-show="trashedData.data && trashedData.data.length === 0" class="p-8 text-center">
+                <svg class="w-12 h-12 text-secondary-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                <p class="text-secondary-500 font-medium">Sampah kosong</p>
+                <p class="text-secondary-400 text-sm">Tidak ada data siswa yang dihapus</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Create/Edit -->
     <div x-show="showModal" 
          x-transition:enter="transition ease-out duration-300"
@@ -336,11 +476,14 @@
                                 <label class="block text-sm font-semibold text-secondary-700 mb-2">
                                     NIS <span class="text-red-500">*</span>
                                 </label>
-                                <input type="text" 
-                                       x-model="formData.nis"
-                                       placeholder="Nomor Induk Siswa"
-                                       :class="errors.nis ? 'border-red-500 ring-red-500' : 'border-secondary-300'"
-                                       class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                               <input type="number" 
+       x-model="formData.nis"
+       placeholder="Nomor Induk Siswa"
+       inputmode="numeric"
+       pattern="[0-9]*"
+       onkeypress="return event.charCode >= 48 && event.charCode <= 57"
+       :class="errors.nis ? 'border-red-500 ring-red-500' : 'border-secondary-300'"
+       class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
                                 <div x-show="errors.nis" x-text="errors.nis" class="text-red-500 text-sm mt-1"></div>
                             </div>
 
@@ -461,17 +604,19 @@
 
                             <!-- No HP -->
                             <div>
-                                <label class="block text-sm font-semibold text-secondary-700 mb-2">
-                                    Nomor HP <span class="text-red-500">*</span>
-                                </label>
-                                <input type="text" 
-                                       x-model="formData.no_hp"
-                                       placeholder="08xxxxxxxxxx"
-                                       :class="errors.no_hp ? 'border-red-500 ring-red-500' : 'border-secondary-300'"
-                                       class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
-                                <div x-show="errors.no_hp" x-text="errors.no_hp" class="text-red-500 text-sm mt-1"></div>
-                            </div>
-
+    <label class="block text-sm font-semibold text-secondary-700 mb-2">
+        Nomor HP <span class="text-red-500">*</span>
+    </label>
+    <input type="text" 
+           x-model="formData.no_hp"
+           placeholder="08xxxxxxxxxx"
+           inputmode="numeric"
+           @input="formData.no_hp = formData.no_hp.replace(/\D/g, '')"
+           maxlength="15"
+           :class="errors.no_hp ? 'border-red-500 ring-red-500' : 'border-secondary-300'"
+           class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+    <div x-show="errors.no_hp" x-text="errors.no_hp" class="text-red-500 text-sm mt-1"></div>
+</div>
                             <!-- Pekerjaan -->
                             <div>
                                 <label class="block text-sm font-semibold text-secondary-700 mb-2">
@@ -677,6 +822,12 @@ function siswaManager() {
         submitButtonText: 'Simpan',
         editMode: false,
         editId: null,
+        
+        // Tab state
+        activeTab: 'active',
+        loading: false,
+        trashedData: { data: [] },
+        trashedCount: 0,
         
         // Notification
         showNotification: false,
@@ -946,6 +1097,115 @@ function siswaManager() {
             setTimeout(() => {
                 this.showNotification = false;
             }, 3000);
+        },
+
+        // Init function
+        init() {
+            // Load trashed count on page load
+            this.loadTrashedCount();
+        },
+
+        async loadTrashedCount() {
+            try {
+                const response = await fetch('/admin/siswa/trashed', {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success && result.data) {
+                        this.trashedCount = result.data.total || 0;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading trashed count:', error);
+            }
+        },
+
+        // Tab functions
+        async loadActiveData() {
+            // Reload current page for active data
+            window.location.reload();
+        },
+
+        async loadTrashedData() {
+            if (this.trashedData.data && this.trashedData.data.length > 0) return; // Already loaded
+            
+            this.loading = true;
+            try {
+                const response = await fetch('/admin/siswa/trashed', {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('Trashed data response:', result); // Debug log
+                
+                if (result.success && result.data) {
+                    // Handle both paginated and direct array response
+                    if (result.data.data) {
+                        // Paginated response
+                        this.trashedData = result.data;
+                        this.trashedCount = result.data.total || 0;
+                    } else if (Array.isArray(result.data)) {
+                        // Direct array response
+                        this.trashedData = { data: result.data };
+                        this.trashedCount = result.data.length;
+                    } else {
+                        console.error('Unexpected data format:', result.data);
+                    }
+                } else {
+                    console.error('Invalid response format:', result);
+                }
+            } catch (error) {
+                console.error('Error loading trashed data:', error);
+                this.showNotificationToast('Gagal memuat data sampah: ' + error.message, 'error');
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async restoreSiswa(id, nama) {
+            if (!confirm(`Pulihkan data siswa "${nama}"?`)) return;
+
+            try {
+                const response = await fetch(`/admin/siswa/${id}/restore`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    this.showNotificationToast(result.message, 'success');
+                    // Reset trashed data to force reload
+                    this.trashedData = { data: [] };
+                    this.trashedCount = Math.max(0, this.trashedCount - 1);
+                    // Reload trashed data
+                    await this.loadTrashedData();
+                } else {
+                    this.showNotificationToast(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                this.showNotificationToast('Terjadi kesalahan saat memulihkan data', 'error');
+            }
         }
     }
 }

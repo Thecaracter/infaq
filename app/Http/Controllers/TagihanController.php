@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\TagihanService;
+use App\Services\WhatsAppService;
 use App\Models\Tunggakan;
 use App\Models\Siswa;
 use App\Models\TransaksiInfaq;
@@ -14,10 +15,12 @@ use Illuminate\Support\Facades\DB;
 class TagihanController extends Controller
 {
     protected $tagihanService;
+    protected $whatsAppService;
 
-    public function __construct(TagihanService $tagihanService)
+    public function __construct(TagihanService $tagihanService, WhatsAppService $whatsAppService)
     {
         $this->tagihanService = $tagihanService;
+        $this->whatsAppService = $whatsAppService;
     }
 
     public function index(Request $request)
@@ -118,7 +121,7 @@ class TagihanController extends Controller
         try {
             DB::beginTransaction();
 
-            $tunggakan = Tunggakan::findOrFail($request->tunggakan_id);
+            $tunggakan = Tunggakan::with(['siswa.orangTua', 'siswa.kelas'])->findOrFail($request->tunggakan_id);
 
             if ($tunggakan->is_lunas) {
                 return response()->json([
@@ -128,11 +131,14 @@ class TagihanController extends Controller
             }
 
             $transaksi = TransaksiInfaq::create([
+                'kode_transaksi' => 'INF-' . time(),
                 'siswa_id' => $tunggakan->siswa_id,
                 'user_id' => auth()->id(),
                 'tanggal_bayar' => $request->tanggal_bayar,
                 'bulan_bayar' => $tunggakan->bulan_tunggakan,
                 'nominal' => $request->nominal,
+                'nominal_kelas' => $tunggakan->nominal_kelas,
+                'jenis_kelas' => $tunggakan->jenis_kelas,
                 'keterangan' => $request->keterangan ?? 'Pembayaran infaq bulan ' . $tunggakan->bulan_tunggakan
             ]);
 
@@ -140,9 +146,12 @@ class TagihanController extends Controller
 
             DB::commit();
 
+            $transaksi->load(['siswa.orangTua', 'siswa.kelas']);
+            $this->sendPaymentConfirmation($transaksi);
+
             return response()->json([
                 'success' => true,
-                'message' => 'Pembayaran berhasil diproses',
+                'message' => 'Pembayaran berhasil diproses dan konfirmasi WhatsApp dikirim',
                 'data' => [
                     'transaksi' => $transaksi,
                     'tunggakan' => $tunggakan->fresh()
@@ -156,6 +165,19 @@ class TagihanController extends Controller
                 'success' => false,
                 'message' => 'Gagal memproses pembayaran: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    private function sendPaymentConfirmation($transaksi)
+    {
+        try {
+            $result = $this->whatsAppService->sendKonfirmasiPembayaran($transaksi);
+            $transaksi->update(['notifikasi_sent' => $result['success']]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to send payment confirmation WhatsApp', [
+                'transaksi_id' => $transaksi->id,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 
@@ -191,12 +213,19 @@ class TagihanController extends Controller
             $siswa = Siswa::with(['orangTua'])->findOrFail($siswaId);
 
             if ($tunggakanId) {
-                $tunggakan = Tunggakan::findOrFail($tunggakanId);
-                $message = $tunggakan->getReminderMessage();
-                $tunggakan->markReminderSent();
+                $tunggakan = Tunggakan::with(['siswa.orangTua', 'siswa.kelas'])->findOrFail($tunggakanId);
+
+                $result = $this->whatsAppService->sendReminderTunggakan($tunggakan->siswa, $tunggakan);
+
+                if ($result['success']) {
+                    $tunggakan->markReminderSent();
+                }
+
+                return response()->json($result);
             } else {
                 $tunggakanList = Tunggakan::where('siswa_id', $siswaId)
                     ->where('is_lunas', false)
+                    ->with(['siswa.orangTua', 'siswa.kelas'])
                     ->get();
 
                 if ($tunggakanList->isEmpty()) {
@@ -206,26 +235,32 @@ class TagihanController extends Controller
                     ], 400);
                 }
 
-                $totalTunggakan = $tunggakanList->count();
-                $totalNominal = $tunggakanList->sum('nominal');
+                $berhasil = 0;
+                $gagal = 0;
 
-                $message = "Yth. {$siswa->orangTua->nama_wali}, pembayaran infaq a.n {$siswa->nama_lengkap} memiliki {$totalTunggakan} bulan tunggakan dengan total Rp " . number_format($totalNominal, 0, ',', '.') . ". Mohon segera dilunasi. Terima kasih.";
+                foreach ($tunggakanList as $tunggakan) {
+                    $result = $this->whatsAppService->sendReminderTunggakan($tunggakan->siswa, $tunggakan);
 
-                foreach ($tunggakanList as $item) {
-                    $item->markReminderSent();
+                    if ($result['success']) {
+                        $tunggakan->markReminderSent();
+                        $berhasil++;
+                    } else {
+                        $gagal++;
+                    }
+
+                    sleep(1);
                 }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => "Reminder selesai. Berhasil: {$berhasil}, Gagal: {$gagal}",
+                    'data' => [
+                        'berhasil' => $berhasil,
+                        'gagal' => $gagal,
+                        'total' => $tunggakanList->count()
+                    ]
+                ]);
             }
-
-            $noHp = $siswa->orangTua->no_hp_wa ?? $siswa->orangTua->no_hp;
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Reminder berhasil dikirim',
-                'data' => [
-                    'no_hp' => $noHp,
-                    'pesan' => $message
-                ]
-            ]);
 
         } catch (\Exception $e) {
             return response()->json([
@@ -247,14 +282,23 @@ class TagihanController extends Controller
 
             foreach ($tunggakanList as $tunggakan) {
                 try {
-                    $message = $tunggakan->getReminderMessage();
-                    $noHp = $tunggakan->siswa->orangTua->no_hp_wa ?? $tunggakan->siswa->orangTua->no_hp;
+                    $result = $this->whatsAppService->sendReminderTunggakan($tunggakan->siswa, $tunggakan);
 
-                    $tunggakan->markReminderSent();
-                    $berhasil++;
+                    if ($result['success']) {
+                        $tunggakan->markReminderSent();
+                        $berhasil++;
+                    } else {
+                        $gagal++;
+                    }
+
+                    sleep(1);
 
                 } catch (\Exception $e) {
                     $gagal++;
+                    \Log::error('Bulk reminder failed for tunggakan', [
+                        'tunggakan_id' => $tunggakan->id,
+                        'error' => $e->getMessage()
+                    ]);
                 }
             }
 

@@ -136,55 +136,58 @@
                     </select>
                 </div>
                 @endif
+                
                 <div>
                     <label class="block text-sm font-medium text-secondary-700 mb-1">Bulan</label>
-                    <input type="month" name="bulan" value="{{ request('bulan') }}" 
-                           class="w-full px-3 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                    <select name="bulan" class="w-full px-3 py-2 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                        <option value="">Semua Bulan</option>
+                        @foreach(range(1, 12) as $m)
+                            <option value="{{ $m }}" {{ request('bulan') == $m ? 'selected' : '' }}>
+                                {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
-            <!-- Button Row -->
-            <div class="flex flex-col sm:flex-row gap-2 pt-2">
-                <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center justify-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    Filter
-                </button>
-                <a href="{{ route('riwayat.index') }}" class="bg-secondary-500 hover:bg-secondary-600 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center justify-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                    </svg>
-                    Reset
+            <!-- Actions -->
+            <div class="flex justify-end gap-2">
+                <a href="{{ route('riwayat.index') }}" 
+                   class="px-4 py-2 border border-secondary-300 rounded-lg hover:bg-secondary-50 transition-colors text-sm">
+                    Reset Filter
                 </a>
+                <button type="submit" 
+                        class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm">
+                    Terapkan Filter
+                </button>
             </div>
         </form>
     </div>
 
-    <!-- Table Section -->
+    <!-- Data Table -->
     <div class="bg-white rounded-xl border border-secondary-200 overflow-hidden">
         <!-- Mobile View -->
-        <div class="block sm:hidden">
+        <div class="sm:hidden divide-y divide-secondary-200">
             @forelse($transaksi as $item)
-            <div class="border-b border-secondary-200 p-4">
+            <div class="p-4">
                 <div class="flex justify-between items-start mb-2">
                     <div>
-                        <h3 class="font-semibold text-secondary-900">{{ $item->siswa->nama_lengkap }}</h3>
-                        <p class="text-sm text-secondary-600">{{ $item->siswa->nis }} • {{ $item->siswa->kelas->nama_kelas }}</p>
+                        <div class="font-medium text-secondary-900">{{ $item->siswa->nama_lengkap }}</div>
+                        <div class="text-sm text-secondary-500">{{ $item->siswa->nis }} • {{ $item->siswa->kelas->nama_kelas }}</div>
                     </div>
                     <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
                         Rp {{ number_format($item->nominal) }}
                     </span>
                 </div>
-                <div class="flex justify-between items-center text-sm text-secondary-600">
-                    <span>{{ \Carbon\Carbon::parse($item->bulan_bayar)->format('M Y') }} • {{ $item->tanggal_bayar->format('d/m/Y') }}</span>
+                <div class="flex justify-between items-center mt-2">
+                    <span class="text-sm text-secondary-600">{{ $item->bulan_bayar_formatted }} • {{ $item->tanggal_bayar->format('d/m/Y') }}</span>
                     <div class="flex space-x-2">
-                        <button @click="printBukti({{ $item->id }})" class="text-blue-600 hover:text-blue-800">
+                        <button @click="printBukti({{ $item->id }})" class="text-blue-600 hover:text-blue-800" title="Print Bukti">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H3a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H7a2 2 0 00-2 2v4a2 2 0 002 2z"></path>
                             </svg>
                         </button>
-                        <button @click="resendWhatsapp({{ $item->id }})" class="text-green-600 hover:text-green-800">
+                        <button @click="resendWhatsapp({{ $item->id }})" class="text-green-600 hover:text-green-800" title="Kirim Ulang WhatsApp">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                             </svg>
@@ -213,9 +216,10 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-secondary-500 uppercase tracking-wider">Nominal</th>
                         @if(Auth::user()->role === 'admin')
                         <th class="px-6 py-3 text-left text-xs font-medium text-secondary-500 uppercase tracking-wider">Input Oleh</th>
-                        @endif
+                        @endif   @if(Auth::user()->role === 'tu')
                         <th class="px-6 py-3 text-left text-xs font-medium text-secondary-500 uppercase tracking-wider">Aksi</th>
-                    </tr>
+                        @endif
+                 </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-secondary-200">
                     @forelse($transaksi as $item)
@@ -227,7 +231,7 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-secondary-900">
-                            {{ \Carbon\Carbon::parse($item->bulan_bayar)->format('F Y') }}
+                            {{ $item->bulan_bayar_formatted }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-secondary-900">
                             {{ $item->tanggal_bayar->format('d/m/Y H:i') }}
@@ -242,6 +246,7 @@
                             {{ $item->user->name }}
                         </td>
                         @endif
+                         @if(Auth::user()->role === 'tu')
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                             <button @click="printBukti({{ $item->id }})" 
                                     class="text-blue-600 hover:text-blue-800 transition-colors" title="Print Bukti">
@@ -255,14 +260,8 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                                 </svg>
                             </button>
-                            <a href="{{ route('riwayat.show', $item->id) }}" 
-                               class="text-secondary-600 hover:text-secondary-800 transition-colors" title="Detail">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                </svg>
-                            </a>
                         </td>
+                        @endif
                     </tr>
                     @empty
                     <tr>
@@ -284,7 +283,7 @@
     <div class="mt-6">
         {{ $transaksi->links() }}
     </div>
-    @endif
+    @endif>
 </div>
 
 <script>

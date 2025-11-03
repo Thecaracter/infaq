@@ -100,7 +100,7 @@
             </div>
 
             <!-- Total Tunggakan -->
-            <div class="bg-white overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-secondary-200 rounded-xl sm:rounded-2xl">
+            <div onclick="openTunggakanModal()" class="bg-white overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-secondary-200 rounded-xl sm:rounded-2xl cursor-pointer hover:border-red-300">
                 <div class="p-4 sm:p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -113,7 +113,12 @@
                         <div class="ml-3 sm:ml-4 flex-1 min-w-0">
                             <p class="text-xs sm:text-sm font-semibold text-secondary-600 uppercase tracking-wider truncate">Tunggakan</p>
                             <p class="text-sm sm:text-lg lg:text-2xl font-bold text-secondary-900">Rp {{ number_format($totalTunggakan / 1000, 0) }}K</p>
-                            <p class="text-xs text-red-600 font-medium mt-1">Perlu Tindak</p>
+                            <p class="text-xs text-red-600 font-medium mt-1">Klik untuk Detail</p>
+                        </div>
+                        <div class="ml-2">
+                            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
                         </div>
                     </div>
                 </div>
@@ -554,5 +559,171 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+    <!-- Modal Tunggakan dengan Vanilla JS -->
+    <div id="tunggakanModal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div id="modalOverlay" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+
+            <!-- Modal content -->
+            <div class="inline-block w-full max-w-4xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+                
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-900">Daftar Siswa Tunggakan</h3>
+                        <p class="mt-1 text-sm text-gray-600">
+                            Total <span id="totalTunggakan">0</span> siswa memiliki tunggakan
+                        </p>
+                    </div>
+                    <button onclick="closeTunggakanModal()" 
+                            class="p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingState" class="flex items-center justify-center py-8 hidden">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-4 h-4 border-2 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-gray-600">Memuat data tunggakan...</span>
+                    </div>
+                </div>
+
+                <!-- Content -->
+                <div id="modalContent" class="max-h-96 overflow-y-auto">
+                    <div id="emptyState" class="text-center py-8 hidden">
+                        <div class="text-gray-400">
+                            <svg class="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-lg font-medium">Tidak ada tunggakan</p>
+                        </div>
+                    </div>
+                    
+                    <div id="tunggakanList" class="space-y-3">
+                        <!-- Data akan diisi dengan JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end">
+                    <button onclick="closeTunggakanModal()" 
+                            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors duration-200">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// Modal Functions dengan Vanilla JS
+function openTunggakanModal() {
+    const modal = document.getElementById('tunggakanModal');
+    const loadingState = document.getElementById('loadingState');
+    const modalContent = document.getElementById('modalContent');
+    
+    // Show modal
+    modal.classList.remove('hidden');
+    
+    // Show loading
+    loadingState.classList.remove('hidden');
+    modalContent.classList.add('hidden');
+    
+    // Load data
+    loadTunggakanData();
+}
+
+function closeTunggakanModal() {
+    const modal = document.getElementById('tunggakanModal');
+    modal.classList.add('hidden');
+}
+
+// Close modal when clicking overlay
+document.getElementById('modalOverlay')?.addEventListener('click', function() {
+    closeTunggakanModal();
+});
+
+async function loadTunggakanData() {
+    try {
+        const response = await fetch('/dashboard/tunggakan-data', {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const result = await response.json();
+        displayTunggakanData(result.data || []);
+    } catch (error) {
+        console.error('Error loading tunggakan data:', error);
+        displayTunggakanData([]);
+    }
+}
+
+function displayTunggakanData(data) {
+    const loadingState = document.getElementById('loadingState');
+    const modalContent = document.getElementById('modalContent');
+    const emptyState = document.getElementById('emptyState');
+    const tunggakanList = document.getElementById('tunggakanList');
+    const totalElement = document.getElementById('totalTunggakan');
+    
+    // Hide loading
+    loadingState.classList.add('hidden');
+    modalContent.classList.remove('hidden');
+    
+    // Update total count
+    totalElement.textContent = data.length;
+    
+    if (data.length === 0) {
+        emptyState.classList.remove('hidden');
+        tunggakanList.innerHTML = '';
+    } else {
+        emptyState.classList.add('hidden');
+        
+        // Generate list HTML
+        const listHTML = data.map(siswa => `
+            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors duration-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-gray-900">${siswa.nama_lengkap}</h4>
+                        <p class="text-sm text-gray-600">
+                            ${siswa.kelas?.nama_kelas || 'N/A'} • 
+                            NIS: ${siswa.nis}
+                        </p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-red-600">Rp ${(siswa.total_tunggakan || 0).toLocaleString('id-ID')}</p>
+                        <p class="text-xs text-gray-500">${siswa.jumlah_tunggakan || 0} bulan</p>
+                    </div>
+                </div>
+                <div class="mt-2 flex space-x-2">
+                    <a href="/tagihan/siswa/${siswa.id}" 
+                       class="inline-flex items-center px-3 py-1 text-xs font-medium text-primary-700 bg-primary-100 rounded-full hover:bg-primary-200 transition-colors duration-200">
+                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        Lihat Tagihan
+                    </a>
+                </div>
+            </div>
+        `).join('');
+        
+        tunggakanList.innerHTML = listHTML;
+    }
+}
+</script>
 @endif
+
+</div>
 @endsection

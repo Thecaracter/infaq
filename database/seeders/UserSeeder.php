@@ -42,5 +42,7 @@ class UserSeeder extends Seeder
             'role' => 'tu',
             'is_active' => true,
         ]);
+
+
     }
 }

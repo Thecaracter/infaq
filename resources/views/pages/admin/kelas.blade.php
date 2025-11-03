@@ -38,7 +38,7 @@
                             Tingkat
                         </th>
                         <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-secondary-700 uppercase tracking-wider">
-                            Jenis
+                            Jenis & Peminatan
                         </th>
                         <th class="px-4 sm:px-6 py-3 sm:py-4 text-left text-xs font-bold text-secondary-700 uppercase tracking-wider">
                             Nominal Bulanan
@@ -79,11 +79,36 @@
                                 </div>
                             </td>
                             <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                                <div class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full
-                                    {{ $kelasItem->jenis_kelas === 'reguler' 
-                                        ? 'bg-green-100 text-green-800' 
-                                        : 'bg-purple-100 text-purple-800' }}">
-                                    {{ $kelasItem->jenis_kelas === 'reguler' ? 'Reguler' : 'Peminatan' }}
+                                <div class="space-y-1">
+                                    @if($kelasItem->jenis_kelas === 'reguler')
+                                        <div class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                                            Reguler
+                                        </div>
+                                    @else
+                                        <div class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">
+                                            Peminatan
+                                        </div>
+                                        @if($kelasItem->peminatan)
+                                            <div class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 mt-1">
+                                                {{ $kelasItem->peminatan }}
+                                            </div>
+                                        @else
+                                            {{-- Extract peminatan from nama_kelas for existing data --}}
+                                            @if(str_contains($kelasItem->nama_kelas, 'IPA'))
+                                                <div class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 mt-1">
+                                                    IPA
+                                                </div>
+                                            @elseif(str_contains($kelasItem->nama_kelas, 'IPS'))
+                                                <div class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800 mt-1">
+                                                    IPS
+                                                </div>
+                                            @elseif(str_contains($kelasItem->nama_kelas, 'BAHASA'))
+                                                <div class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full bg-pink-100 text-pink-800 mt-1">
+                                                    BAHASA
+                                                </div>
+                                            @endif
+                                        @endif
+                                    @endif
                                 </div>
                             </td>
                             <td class="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
@@ -173,13 +198,36 @@
                                 <div class="min-w-0 flex-1">
                                     <h3 class="font-semibold text-secondary-900 truncate">{{ $kelasItem->nama_kelas }}</h3>
                                     <p class="text-xs text-blue-600 font-medium">Kelas {{ $kelasItem->tingkat_sma }}</p>
-                                    <div class="flex items-center space-x-2 mt-1">
-                                        <span class="px-2 py-1 text-xs font-medium rounded-full
-                                            {{ $kelasItem->jenis_kelas === 'reguler' 
-                                                ? 'bg-green-100 text-green-800' 
-                                                : 'bg-purple-100 text-purple-800' }}">
-                                            {{ $kelasItem->jenis_kelas === 'reguler' ? 'Reguler' : 'Peminatan' }}
-                                        </span>
+                                    <div class="flex flex-wrap gap-1 mt-1">
+                                        @if($kelasItem->jenis_kelas === 'reguler')
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                                                Reguler
+                                            </span>
+                                        @else
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">
+                                                Peminatan
+                                            </span>
+                                            @if($kelasItem->peminatan)
+                                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                                                    {{ $kelasItem->peminatan }}
+                                                </span>
+                                            @else
+                                                {{-- Extract peminatan from nama_kelas for existing data --}}
+                                                @if(str_contains($kelasItem->nama_kelas, 'IPA'))
+                                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                                                        IPA
+                                                    </span>
+                                                @elseif(str_contains($kelasItem->nama_kelas, 'IPS'))
+                                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800">
+                                                        IPS
+                                                    </span>
+                                                @elseif(str_contains($kelasItem->nama_kelas, 'BAHASA'))
+                                                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-pink-100 text-pink-800">
+                                                        BAHASA
+                                                    </span>
+                                                @endif
+                                            @endif
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -403,6 +451,22 @@
                         </p>
                     </div>
 
+                    <!-- Peminatan (only show if jenis_kelas is peminatan) -->
+                    <div x-show="formData.jenis_kelas === 'peminatan'" x-transition>
+                        <label for="peminatan" class="block text-sm font-semibold text-secondary-700 mb-2">
+                            Peminatan <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" 
+                               x-model="formData.peminatan"
+                               placeholder="Contoh: IPA, IPS, Bahasa"
+                               :class="errors.peminatan ? 'border-red-500 ring-red-500' : 'border-secondary-300'"
+                               class="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-200">
+                        <div x-show="errors.peminatan" x-text="errors.peminatan" class="text-red-500 text-sm mt-1"></div>
+                        <p class="text-xs text-secondary-500 mt-1">
+                            Wajib diisi untuk kelas peminatan (XI & XII)
+                        </p>
+                    </div>
+
                     <!-- Nominal Bulanan -->
                     <div>
                         <label for="nominal_bulanan" class="block text-sm font-semibold text-secondary-700 mb-2">
@@ -622,6 +686,7 @@ function kelasManager() {
             nama_kelas: '',
             tingkat: '',
             jenis_kelas: '',
+            peminatan: '',
             nominal_bulanan: '',
             tahun_ajaran_id: '',
             is_active: true
@@ -656,6 +721,7 @@ function kelasManager() {
                         nama_kelas: result.data.nama_kelas,
                         tingkat: result.data.tingkat.toString(),
                         jenis_kelas: result.data.jenis_kelas,
+                        peminatan: result.data.peminatan || '',
                         nominal_bulanan: result.data.nominal_bulanan,
                         tahun_ajaran_id: result.data.tahun_ajaran_id.toString(),
                         is_active: result.data.is_active
@@ -682,6 +748,7 @@ function kelasManager() {
                 nama_kelas: '',
                 tingkat: '',
                 jenis_kelas: '',
+                peminatan: '',
                 nominal_bulanan: '',
                 tahun_ajaran_id: '',
                 is_active: true

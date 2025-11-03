@@ -88,4 +88,48 @@ class DashboardController extends Controller
 
         return $data;
     }
+
+    /**
+     * Get data siswa yang memiliki tunggakan untuk modal
+     */
+    public function getTunggakanData()
+    {
+        try {
+            $siswaMenunggak = Siswa::whereHas('tunggakans', function ($query) {
+                $query->belumLunas();
+            })
+                ->with([
+                    'kelas',
+                    'tunggakans' => function ($query) {
+                        $query->belumLunas();
+                    }
+                ])
+                ->get()
+                ->map(function ($siswa) {
+                    return [
+                        'id' => $siswa->id,
+                        'nama_lengkap' => $siswa->nama_lengkap,
+                        'nis' => $siswa->nis,
+                        'kelas' => $siswa->kelas ? [
+                            'nama_kelas' => $siswa->kelas->nama_kelas
+                        ] : null,
+                        'total_tunggakan' => $siswa->tunggakans->sum('nominal'),
+                        'jumlah_tunggakan' => $siswa->tunggakans->count()
+                    ];
+                })
+                ->sortByDesc('total_tunggakan')
+                ->values();
+
+            return response()->json([
+                'success' => true,
+                'data' => $siswaMenunggak
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat mengambil data tunggakan',
+                'data' => []
+            ], 500);
+        }
+    }
 }

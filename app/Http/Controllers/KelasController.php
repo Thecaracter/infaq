@@ -25,19 +25,27 @@ class KelasController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $rules = [
             'nama_kelas' => 'required|string|max:255',
             'tingkat' => 'required|integer|in:10,11,12',
             'jenis_kelas' => 'required|in:reguler,peminatan',
             'nominal_bulanan' => 'required|numeric|min:0',
             'tahun_ajaran_id' => 'required|exists:tahun_ajarans,id',
             'is_active' => 'nullable|boolean'
-        ], [
+        ];
+
+        // Conditional validation for peminatan
+        if ($request->jenis_kelas === 'peminatan') {
+            $rules['peminatan'] = 'required|string|max:255';
+        }
+
+        $request->validate($rules, [
             'nama_kelas.required' => 'Nama kelas harus diisi.',
             'tingkat.required' => 'Tingkat kelas harus diisi.',
             'tingkat.in' => 'Tingkat kelas harus 10, 11, atau 12.',
             'jenis_kelas.required' => 'Jenis kelas harus dipilih.',
             'jenis_kelas.in' => 'Jenis kelas tidak valid.',
+            'peminatan.required' => 'Peminatan harus diisi untuk kelas peminatan.',
             'nominal_bulanan.required' => 'Nominal bulanan harus diisi.',
             'nominal_bulanan.numeric' => 'Nominal bulanan harus berupa angka.',
             'nominal_bulanan.min' => 'Nominal bulanan tidak boleh negatif.',
@@ -64,6 +72,7 @@ class KelasController extends Controller
                 'nama_kelas' => $request->nama_kelas,
                 'tingkat' => $request->tingkat,
                 'jenis_kelas' => $request->jenis_kelas,
+                'peminatan' => $request->jenis_kelas === 'peminatan' ? $request->peminatan : null,
                 'nominal_bulanan' => $request->nominal_bulanan,
                 'tahun_ajaran_id' => $request->tahun_ajaran_id,
                 'is_active' => $request->boolean('is_active', true)
@@ -91,6 +100,7 @@ class KelasController extends Controller
                 'nama_kelas' => $kelas->nama_kelas,
                 'tingkat' => $kelas->tingkat,
                 'jenis_kelas' => $kelas->jenis_kelas,
+                'peminatan' => $kelas->peminatan,
                 'nominal_bulanan' => $kelas->nominal_bulanan,
                 'tahun_ajaran_id' => $kelas->tahun_ajaran_id,
                 'is_active' => $kelas->is_active
@@ -100,19 +110,27 @@ class KelasController extends Controller
 
     public function update(Request $request, Kelas $kelas)
     {
-        $request->validate([
+        $rules = [
             'nama_kelas' => 'required|string|max:255',
             'tingkat' => 'required|integer|in:10,11,12',
             'jenis_kelas' => 'required|in:reguler,peminatan',
             'nominal_bulanan' => 'required|numeric|min:0',
             'tahun_ajaran_id' => 'required|exists:tahun_ajarans,id',
             'is_active' => 'nullable|boolean'
-        ], [
+        ];
+
+        // Conditional validation for peminatan
+        if ($request->jenis_kelas === 'peminatan') {
+            $rules['peminatan'] = 'required|string|max:255';
+        }
+
+        $request->validate($rules, [
             'nama_kelas.required' => 'Nama kelas harus diisi.',
             'tingkat.required' => 'Tingkat kelas harus diisi.',
             'tingkat.in' => 'Tingkat kelas harus 10, 11, atau 12.',
             'jenis_kelas.required' => 'Jenis kelas harus dipilih.',
             'jenis_kelas.in' => 'Jenis kelas tidak valid.',
+            'peminatan.required' => 'Peminatan harus diisi untuk kelas peminatan.',
             'nominal_bulanan.required' => 'Nominal bulanan harus diisi.',
             'nominal_bulanan.numeric' => 'Nominal bulanan harus berupa angka.',
             'nominal_bulanan.min' => 'Nominal bulanan tidak boleh negatif.',
@@ -140,6 +158,7 @@ class KelasController extends Controller
                 'nama_kelas' => $request->nama_kelas,
                 'tingkat' => $request->tingkat,
                 'jenis_kelas' => $request->jenis_kelas,
+                'peminatan' => $request->jenis_kelas === 'peminatan' ? $request->peminatan : null,
                 'nominal_bulanan' => $request->nominal_bulanan,
                 'tahun_ajaran_id' => $request->tahun_ajaran_id,
                 'is_active' => $request->boolean('is_active', true)
@@ -156,6 +175,67 @@ class KelasController extends Controller
                 'message' => 'Gagal mengupdate kelas. ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function destroy(Kelas $kelas)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Soft delete the kelas
+            $kelas->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kelas berhasil dihapus.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus kelas. ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function restore($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $kelas = Kelas::withTrashed()->findOrFail($id);
+            $kelas->restore();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kelas berhasil dipulihkan.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memulihkan kelas. ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function trashed()
+    {
+        $kelas = Kelas::onlyTrashed()
+            ->with('tahunAjaran')
+            ->latest('deleted_at')
+            ->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => $kelas
+        ]);
     }
 
     public function toggleActive(Kelas $kelas)
@@ -181,33 +261,6 @@ class KelasController extends Controller
         }
     }
 
-    public function destroy(Kelas $kelas)
-    {
-        try {
-            // Cek apakah kelas masih digunakan oleh siswa
-            if ($kelas->siswas()->count() > 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Kelas tidak dapat dihapus karena masih memiliki siswa.'
-                ], 422);
-            }
-
-            $kelas->delete();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Kelas berhasil dihapus.'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menghapus kelas. ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    // Method helper untuk mendapatkan options
     public function getOptions()
     {
         return response()->json([

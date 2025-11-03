@@ -8,7 +8,7 @@ use App\Http\Controllers\KelasController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TagihanController;
-use App\Http\Controllers\RiwayatController; // TAMBAH INI
+use App\Http\Controllers\RiwayatController;
 use App\Http\Controllers\CronController;
 
 Route::get('/', function () {
@@ -24,10 +24,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/change-password', [AuthController::class, 'showChangePasswordForm'])->name('change-password');
     Route::post('/change-password', [AuthController::class, 'changePassword']);
+
+    // Test WhatsApp route (only for debugging)
+    Route::get('/test-wa', function () {
+        $waService = new \App\Services\WhatsAppService();
+        return response()->json($waService->testConnection());
+    });
 });
 
 Route::middleware(['auth', 'check.role:admin,tu'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard/tunggakan-data', [DashboardController::class, 'getTunggakanData'])->name('dashboard.tunggakan-data');
 
     // Tagihan routes - untuk admin dan TU  
     Route::prefix('tagihan')->name('tagihan.')->group(function () {
@@ -38,7 +45,7 @@ Route::middleware(['auth', 'check.role:admin,tu'])->group(function () {
         Route::post('/reminder/{siswa_id}/{tunggakan_id}', [TagihanController::class, 'kirimReminder'])->name('reminder.single');
     });
 
-    // RIWAYAT PEMBAYARAN ROUTES - TAMBAH INI
+    // RIWAYAT PEMBAYARAN ROUTES
     Route::prefix('riwayat')->name('riwayat.')->group(function () {
         Route::get('/', [RiwayatController::class, 'index'])->name('index');
         Route::get('/{id}', [RiwayatController::class, 'show'])->name('show')->where('id', '[0-9]+');
@@ -46,31 +53,38 @@ Route::middleware(['auth', 'check.role:admin,tu'])->group(function () {
         Route::get('/{id}/print', [RiwayatController::class, 'print'])->name('print')->where('id', '[0-9]+');
         Route::post('/{id}/resend-whatsapp', [RiwayatController::class, 'resendWhatsapp'])->name('resend-whatsapp')->where('id', '[0-9]+');
     });
+
 });
 
 Route::middleware(['auth', 'check.role:admin'])->group(function () {
     // Tahun Ajaran
     Route::get('/admin/tahun-ajaran', [TahunAjaranController::class, 'index'])->name('admin.tahun-ajaran.index');
+    Route::get('/admin/tahun-ajaran/trashed', [TahunAjaranController::class, 'trashed'])->name('admin.tahun-ajaran.trashed');
     Route::post('/admin/tahun-ajaran', [TahunAjaranController::class, 'store'])->name('admin.tahun-ajaran.store');
     Route::get('/admin/tahun-ajaran/{tahunAjaran}', [TahunAjaranController::class, 'show'])->name('admin.tahun-ajaran.show');
     Route::put('/admin/tahun-ajaran/{tahunAjaran}', [TahunAjaranController::class, 'update'])->name('admin.tahun-ajaran.update');
     Route::delete('/admin/tahun-ajaran/{tahunAjaran}', [TahunAjaranController::class, 'destroy'])->name('admin.tahun-ajaran.destroy');
+    Route::post('/admin/tahun-ajaran/{id}/restore', [TahunAjaranController::class, 'restore'])->name('admin.tahun-ajaran.restore');
     Route::post('/admin/tahun-ajaran/{tahunAjaran}/toggle-active', [TahunAjaranController::class, 'toggleActive'])->name('admin.tahun-ajaran.toggle-active');
 
     // Kelas
     Route::get('/admin/kelas', [KelasController::class, 'index'])->name('admin.kelas.index');
     Route::post('/admin/kelas', [KelasController::class, 'store'])->name('admin.kelas.store');
+    Route::get('/admin/kelas/trashed', [KelasController::class, 'trashed'])->name('admin.kelas.trashed');
     Route::get('/admin/kelas/{kelas}', [KelasController::class, 'show'])->name('admin.kelas.show');
     Route::put('/admin/kelas/{kelas}', [KelasController::class, 'update'])->name('admin.kelas.update');
     Route::delete('/admin/kelas/{kelas}', [KelasController::class, 'destroy'])->name('admin.kelas.destroy');
+    Route::post('/admin/kelas/{id}/restore', [KelasController::class, 'restore'])->name('admin.kelas.restore');
     Route::post('/admin/kelas/{kelas}/toggle-active', [KelasController::class, 'toggleActive'])->name('admin.kelas.toggle-active');
 
     // Siswa
     Route::get('/admin/siswa', [SiswaController::class, 'index'])->name('admin.siswa.index');
     Route::post('/admin/siswa', [SiswaController::class, 'store'])->name('admin.siswa.store');
+    Route::get('/admin/siswa/trashed', [SiswaController::class, 'trashed'])->name('admin.siswa.trashed');
     Route::get('/admin/siswa/{siswa}', [SiswaController::class, 'show'])->name('admin.siswa.show');
     Route::put('/admin/siswa/{siswa}', [SiswaController::class, 'update'])->name('admin.siswa.update');
     Route::delete('/admin/siswa/{siswa}', [SiswaController::class, 'destroy'])->name('admin.siswa.destroy');
+    Route::post('/admin/siswa/{id}/restore', [SiswaController::class, 'restore'])->name('admin.siswa.restore');
     Route::post('/admin/siswa/{siswa}/toggle-active', [SiswaController::class, 'toggleActive'])->name('admin.siswa.toggle-active');
 
     // User Management

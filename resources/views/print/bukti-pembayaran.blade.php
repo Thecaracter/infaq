@@ -151,7 +151,7 @@
             <!-- Informasi Pembayaran -->
             <div class="row">
                 <span class="label">Periode:</span>
-                <span class="value">{{ \Carbon\Carbon::parse($transaksi->bulan_bayar)->format('F Y') }}</span>
+                <span class="value">{{ $transaksi->bulan_bayar_formatted }}</span>
             </div>
             
             <div class="row highlight">

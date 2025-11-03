@@ -211,6 +211,67 @@ class SiswaController extends Controller
         }
     }
 
+    public function destroy(Siswa $siswa)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Soft delete the siswa
+            $siswa->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Siswa berhasil dihapus.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus siswa. ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function restore($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $siswa = Siswa::withTrashed()->findOrFail($id);
+            $siswa->restore();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Siswa berhasil dipulihkan.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memulihkan siswa. ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function trashed()
+    {
+        $siswas = Siswa::onlyTrashed()
+            ->with(['kelas', 'orangTua', 'tahunAjaran'])
+            ->latest('deleted_at')
+            ->paginate(10);
+
+        return response()->json([
+            'success' => true,
+            'data' => $siswas
+        ]);
+    }
+
     public function toggleActive(Siswa $siswa)
     {
         try {
@@ -230,47 +291,6 @@ class SiswaController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal mengubah status siswa. ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function destroy(Siswa $siswa)
-    {
-        DB::beginTransaction();
-        try {
-
-            if ($siswa->transaksiInfaqs()->count() > 0 || $siswa->tunggakans()->count() > 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Siswa tidak dapat dihapus karena masih memiliki transaksi atau tunggakan.'
-                ], 422);
-            }
-
-            $orangTuaId = $siswa->orang_tua_id;
-
-
-            $siswa->delete();
-
-
-            $otherChildren = Siswa::where('orang_tua_id', $orangTuaId)->count();
-
-
-            if ($otherChildren === 0) {
-                OrangTua::find($orangTuaId)->delete();
-            }
-
-            DB::commit();
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Siswa berhasil dihapus.'
-            ]);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal menghapus siswa. ' . $e->getMessage()
             ], 500);
         }
     }

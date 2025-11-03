@@ -89,11 +89,6 @@
                 <span class="ml-3 text-sm text-gray-600 group-hover:text-gray-800 transition-colors duration-200 select-none">Ingat saya</span>
             </label>
             
-            <div class="text-sm">
-                <a href="#" class="font-medium text-primary-600 hover:text-primary-500 transition-colors duration-200 hover:underline">
-                    Lupa password?
-                </a>
-            </div>
         </div>
 
         <!-- Submit Button dengan loading state -->

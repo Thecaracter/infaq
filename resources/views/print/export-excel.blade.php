@@ -71,7 +71,7 @@
                 <td>{{ $item->siswa->nis }}</td>
                 <td>{{ $item->siswa->nama_lengkap }}</td>
                 <td>{{ $item->siswa->kelas->nama_kelas }}</td>
-                <td>{{ \Carbon\Carbon::parse($item->bulan_bayar)->format('F Y') }}</td>
+                <td>{{ $item->bulan_bayar_formatted }}</td>
                 <td class="number">{{ number_format($item->nominal, 0, ',', '.') }}</td>
                 <td>{{ $item->user->name }}</td>
             </tr>

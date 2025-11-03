@@ -104,4 +104,46 @@ class TransaksiInfaq extends Model
     {
         return max(0, $this->nominal_kelas - $this->nominal);
     }
+
+    // Method untuk mengkonversi bulan Indonesia ke Carbon
+    public function getBulanBayarCarbonAttribute()
+    {
+        $bulanIndonesia = [
+            'Januari' => 'January',
+            'Februari' => 'February',
+            'Maret' => 'March',
+            'April' => 'April',
+            'Mei' => 'May',
+            'Juni' => 'June',
+            'Juli' => 'July',
+            'Agustus' => 'August',
+            'September' => 'September',
+            'Oktober' => 'October',
+            'November' => 'November',
+            'Desember' => 'December'
+        ];
+
+        if (isset($bulanIndonesia[$this->bulan_bayar])) {
+            $bulanInggris = $bulanIndonesia[$this->bulan_bayar];
+            // Ambil tahun dari tanggal_bayar
+            $tanggalBayar = \Carbon\Carbon::parse($this->tanggal_bayar);
+            $tahun = $tanggalBayar->year;
+            return \Carbon\Carbon::createFromFormat('F Y', "$bulanInggris $tahun");
+        }
+
+        // Fallback jika format tidak dikenali
+        return \Carbon\Carbon::now();
+    }
+
+    // Method untuk format bulan yang aman
+    public function getBulanBayarFormattedAttribute()
+    {
+        try {
+            return $this->getBulanBayarCarbonAttribute()->format('M Y');
+        } catch (\Exception $e) {
+            // Fallback ke string asli jika terjadi error
+            $tanggalBayar = \Carbon\Carbon::parse($this->tanggal_bayar);
+            return $this->bulan_bayar . ' ' . $tanggalBayar->year;
+        }
+    }
 }

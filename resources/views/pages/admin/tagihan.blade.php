@@ -409,7 +409,41 @@
     </div>
 </div>
 
+<style>
+/* Animation for success modal */
+.animate-scale-in {
+    animation: scaleIn 0.3s ease-out;
+}
+
+.animate-fade-out {
+    animation: fadeOut 0.3s ease-in;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+</style>
+
 <script>
+// User role dari server
+const userRole = '{{ Auth::user()->role }}';
+
 // Prevent race conditions dengan debouncing
 let searchTimeout;
 let loadingStates = new Map();
@@ -538,10 +572,12 @@ function renderSiswaDetail(data) {
                                     Jatuh tempo: ${formatDate(item.tanggal_jatuh_tempo)} • Rp ${item.nominal.toLocaleString()}
                                 </div>
                             </div>
+                            ${userRole === 'tu' ? `
                             <button onclick="bayarTunggakan(${item.id}, '${item.bulan_tunggakan}', ${item.nominal})" 
                                     class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors mt-2 sm:mt-0">
                                 Bayar
                             </button>
+                            ` : ''}
                         </div>
                     </div>
                 `).join('') : '<div class="text-center py-8 text-gray-500">Tidak ada tunggakan</div>'}
@@ -562,6 +598,16 @@ function renderSiswaDetail(data) {
                             <div class="text-right mt-2 sm:mt-0">
                                 <div class="font-bold text-green-700">Rp ${item.nominal.toLocaleString()}</div>
                                 <div class="text-xs text-green-600">${item.kode_transaksi}</div>
+                                <div class="mt-2">
+                                    <button onclick="printBukti(${item.id})" 
+                                            class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-2 py-1 rounded text-xs font-medium transition-colors"
+                                            title="Print Bukti Pembayaran">
+                                        <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H3a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H7a2 2 0 00-2 2v4a2 2 0 002 2z"></path>
+                                        </svg>
+                                        Print
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -683,10 +729,12 @@ document.getElementById('pembayaranForm')?.addEventListener('submit', async func
         const data = await response.json();
         
         if (data.success) {
-            showSuccess('Pembayaran berhasil diproses!');
             hidePembayaranModal();
             hideSiswaModal();
-            setTimeout(() => location.reload(), 1500);
+            
+            // Show success popup with print option
+            const transaksiId = data.data?.transaksi?.id || null;
+            showSuccessWithPrintOption(transaksiId);
         } else {
             showError('Error: ' + data.message);
         }
@@ -789,6 +837,79 @@ function showSuccess(message) {
 
 function showError(message) {
     showNotification(message, 'error');
+}
+
+// Show success popup with print option after payment
+function showSuccessWithPrintOption(transaksiId) {
+    // Create modal backdrop
+    const backdrop = document.createElement('div');
+    backdrop.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+    backdrop.id = 'successPrintModal';
+    
+    // Create modal content
+    backdrop.innerHTML = `
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 transform animate-scale-in">
+            <div class="p-6 text-center">
+                <!-- Success Icon -->
+                <div class="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                
+                <!-- Success Message -->
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Pembayaran Berhasil!</h3>
+                <p class="text-gray-600 mb-6">Transaksi telah berhasil diproses. Apakah Anda ingin mencetak bukti pembayaran sekarang?</p>
+                
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onclick="printAndClose(${transaksiId})" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center justify-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H3a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H7a2 2 0 00-2 2v4a2 2 0 002 2z"></path>
+                        </svg>
+                        Ya, Print Sekarang
+                    </button>
+                    <button onclick="closeSuccessModal()" 
+                            class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-6 py-2 rounded-lg font-medium transition-colors">
+                        Nanti Saja
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(backdrop);
+    
+    // Auto focus on print button
+    setTimeout(() => {
+        backdrop.querySelector('button').focus();
+    }, 100);
+}
+
+// Print and close success modal
+function printAndClose(transaksiId) {
+    // Close the success modal
+    closeSuccessModal();
+    
+    // Open print window
+    printBukti(transaksiId);
+    
+    // Reload page after short delay
+    setTimeout(() => location.reload(), 1000);
+}
+
+// Close success modal
+function closeSuccessModal() {
+    const modal = document.getElementById('successPrintModal');
+    if (modal) {
+        modal.classList.add('animate-fade-out');
+        setTimeout(() => {
+            document.body.removeChild(modal);
+            // Reload page
+            location.reload();
+        }, 300);
+    }
 }
 
 // AJAX search tanpa reload halaman - CLEAN VERSION
@@ -966,6 +1087,15 @@ document.addEventListener('touchend', function (event) {
     }
     lastTouchEnd = now;
 }, false);
+
+// Print bukti pembayaran function
+function printBukti(transaksiId) {
+    // Open print page in new window
+    const printWindow = window.open(`{{ route('riwayat.print', ':id') }}`.replace(':id', transaksiId), '_blank');
+    printWindow.onload = function() {
+        printWindow.print();
+    };
+}
 
 // Handle orientation change
 window.addEventListener('orientationchange', function() {

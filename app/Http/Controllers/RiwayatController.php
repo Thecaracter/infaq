@@ -70,29 +70,8 @@ class RiwayatController extends Controller
 
     public function show($id)
     {
-        $transaksi = TransaksiInfaq::with(['siswa.kelas', 'siswa.orangTua', 'user'])
-            ->findOrFail($id);
-
-        // Cek permission
-        if (Auth::user()->role === 'tu' && $transaksi->user_id !== Auth::id()) {
-            abort(403, 'Anda tidak memiliki akses ke transaksi ini.');
-        }
-
-        // Ambil riwayat pembayaran siswa untuk bulan yang sama
-        $riwayat_bulan = TransaksiInfaq::where('siswa_id', $transaksi->siswa_id)
-            ->where('bulan_bayar', $transaksi->bulan_bayar)
-            ->with('user')
-            ->orderBy('created_at', 'asc')
-            ->get();
-
-        // Ambil semua riwayat pembayaran siswa
-        $semua_riwayat = TransaksiInfaq::where('siswa_id', $transaksi->siswa_id)
-            ->with('user')
-            ->orderBy('tanggal_bayar', 'desc')
-            ->limit(10)
-            ->get();
-
-        return view('pages.admin.riwayat-detail', compact('transaksi', 'riwayat_bulan', 'semua_riwayat'));
+        // Redirect ke halaman riwayat karena detail tidak diperlukan
+        return redirect()->route('riwayat.index');
     }
 
     public function export(Request $request)
